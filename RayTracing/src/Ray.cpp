@@ -34,13 +34,29 @@ float Ray::Hit(Geometry* geo)
 	}
 	case GeoType::Triangle: {
 		auto* triangle = static_cast<Triangle*> (geo);
-	
-		glm::vec3 pp = glm::perp(triangle->GetPos(0) - m_Pos, triangle->GetNorm(m_Pos));
-		float cosval = glm::dot(pp, m_Dir) / glm::l2Norm(pp) / glm::l2Norm(m_Dir);
-		float sinval = sqrt(1 - cosval * cosval);
-		float dist = glm::l2Norm(pp) / sinval;
-		if (triangle->OnTriangle(m_Pos + m_Dir * dist))
+		glm::vec3 norm = triangle->GetNorm(m_Pos);
+		glm::vec3 pp = glm::proj(triangle->GetPos(0) - m_Pos, norm);
+		if (glm::l2Norm(pp) < 1e-6) {
+			// Too close to the triangle
+			return std::numeric_limits<float>::max();
+		}
+		if (pp.x * norm.x > 0 || pp.y * norm.y > 0 || pp.z * norm.z > 0) {
+			// In the back of the triangle
+			return std::numeric_limits<float>::max();
+		}
+		float cosval = glm::dot(pp, m_Dir) / glm::l2Norm(pp);
+		if (cosval <= 1e-6) {
+			// Leaving or perpendicular to the plane of the triangle
+			return std::numeric_limits<float>::max();
+		}
+		float dist = glm::l2Norm(pp) / cosval;
+		glm::vec3 pos = m_Pos + m_Dir * dist;
+		glm::vec3 vec = pos - triangle->GetPos(0);
+		float val = glm::l2Norm(glm::proj(vec, norm));
+		assert(val < 1e-4);
+		if (triangle->OnTriangle(m_Pos + m_Dir * dist)) {
 			return dist;
+		}
 		else return std::numeric_limits<float>::max();
 	}
 	default: {

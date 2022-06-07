@@ -134,6 +134,7 @@
     <ClInclude Include="src\Cuboid.h" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Random.h" />
+    <ClInclude Include="src\Testtool.hpp" />
     <ClInclude Include="src\Triangle.h" />
     <ClInclude Include="src\Geometry.h" />
     <ClInclude Include="src\Image.h" />
