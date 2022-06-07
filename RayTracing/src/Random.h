@@ -13,7 +13,8 @@ class Random {
 public:
 	inline static float Rand(float l, float r) { return GetInstance().prRand(l, r); }
 	inline static float Rand(float r) { return GetInstance().prRand(r); }
-	inline static glm::vec3 GenVec(float r) { return GetInstance().prGenVec(r); }
+	inline static glm::vec3 RandinDisc(float r) { return GetInstance().prRandinDisc(r); }
+	inline static glm::vec3 RandinSphere(float r) { return GetInstance().prRandinSphere(r); }
 private:
 	Random() = default;
 	Random(Random const&) = delete;
@@ -28,12 +29,17 @@ private:
 		std::uniform_real_distribution<float> dist(0, r);
 		return (float)dist(m_Engine);
 	}
-	inline glm::vec3 prGenVec(float r) {
-		while(true) {
-		    glm::vec3 vec(Rand(-r, r), 0.0, Rand(-r, r));
-		    if (r * r - vec.x * vec.x - vec.z * vec.z < 0) continue;
-		    return glm::vec3(vec.x, sqrt(r * r - vec.x * vec.x - vec.z * vec.z), vec.z);
-		}
+	inline glm::vec3 prRandinDisc(float r) {
+		float theta = prRand(2 * pi);
+		float rad = prRand(r);
+		rad = sqrt(rad);
+		return glm::vec3(rad * cos(theta), rad * sin(theta), sqrt(r * r - rad * rad));
+	}
+	inline glm::vec3 prRandinSphere(float r) {
+		float theta = prRand(2 * pi), phi = prRand(pi);
+		float rad = prRand(r);
+		rad = sqrt(rad);
+		return glm::vec3(rad * cos(phi) * cos(theta), rad * cos(phi) * sin(theta), rad * sin(phi));
 	}
 	inline static Random& GetInstance() {
 		static Random* Instance = new Random;

@@ -10,7 +10,7 @@
 float Diffuse::scatter(glm::vec3 pos, glm::vec3 wo, glm::vec3 norm, glm::vec3& attenuation,
     glm::vec3& wi)
 {
-    wi = Random::GenVec(1.0f);
+    wi = Random::RandinDisc(1.0f);
     glm::vec3 ppnm = glm::perp(norm + glm::vec3(1.0f, 0, 0), norm);
     if (glm::l2Norm(ppnm) < 1e-6f) {
         // norm = (1, 0, 0)
@@ -24,4 +24,16 @@ float Diffuse::scatter(glm::vec3 pos, glm::vec3 wo, glm::vec3 norm, glm::vec3& a
     }
     attenuation = m_Albedo / pi;
     return glm::dot(norm, wi) / pi;
+}
+
+float Metal::scatter(glm::vec3 pos, glm::vec3 wo, glm::vec3 norm, glm::vec3& attenuation, glm::vec3& wi)
+{
+    attenuation = m_Albedo;
+    wi = glm::reflect(-wo, norm) + Random::RandinSphere(m_Fuzz);
+    if (glm::dot(wi, norm) < 1e-6) {
+        // wi = 0 or too small angle
+        attenuation = glm::vec3(0.0f);
+    }
+    wi = glm::normalize(wi);
+    return 1.0f;
 }
