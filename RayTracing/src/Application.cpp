@@ -7,11 +7,11 @@
 #include "glm/gtx/norm.hpp"
 
 int main() {
-	int const Width = 512, Height = 256;
+	int const Width = 1024, Height = 512;
 	Image3 img(Width, Height);
 	Camera cam(glm::vec3(0.0f), glm::vec3(1.0f, 0.0f, 0.0f),
 		glm::vec3(0.0f, 1.0f, 0.0f), 1.5f, 1.0472f);
-	World world(cam, glm::vec3(1.0f));
+	World world(cam, glm::vec3(0.9f, 0.5f, 0.4f));
 	std::shared_ptr<Geometry> ball1(new Ball(glm::vec3(1.0f, -0.14f, -0.36f), 0.35f));
 	ball1->AddMaterial(std::shared_ptr<Material>(new Diffuse(glm::vec3(0.2f, 0.8f, 0.1f))));
 	world.AddGeo(ball1);
@@ -26,7 +26,7 @@ int main() {
 	fl2->AddMaterial(std::shared_ptr<Material>(new Diffuse(glm::vec3(0.1f, 0.2f, 0.8f))));
 	world.AddGeo(fl2);
 	std::vector<Ray> rays;
-	int nrays = 256;
+	int nrays = 800;
 	for (int i = 0; i < Width; ++i) {
 		for (int j = 0; j < Height; ++j) {
 			cam.GenRay(i, j, Width, Height, rays, nrays);

@@ -4,6 +4,10 @@ This is a simple C++ ray tracing learning project.
 
 It's based on Visual Studio 2022.
 
+# Current Performance
+
+![](RayTracing\testpic.png)
+
 # Used Submodules
 
 - [glm](https://github.com/g-truc/glm) for math support
