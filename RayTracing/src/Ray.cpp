@@ -33,6 +33,9 @@ float Ray::Hit(Geometry* geo)
 		return glm::l2Norm(tolen) - sqrt(r * r - glm::dot(diff, diff));
 	}
 	case GeoType::Triangle: {
+		assert(fabs(m_Dir.x) < 1.5f);
+		assert(fabs(m_Dir.y) < 1.5f);
+		assert(fabs(m_Dir.z) < 1.5f);
 		auto* triangle = static_cast<Triangle*> (geo);
 		glm::vec3 norm = triangle->GetNorm(m_Pos);
 		glm::vec3 pp = glm::proj(triangle->GetPos(0) - m_Pos, norm);

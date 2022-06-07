@@ -21,18 +21,18 @@ private:
 	Random& operator=(Random const&) = delete;
 	Random& operator=(Random&&) = delete;
 	inline float prRand(float l, float r) {
-		std::uniform_real_distribution<> dist(l, r);
+		std::uniform_real_distribution<float> dist(l, r);
 		return (float)dist(m_Engine);
 	}
 	inline float prRand(float r) {
-		std::uniform_real_distribution<> dist(0, r);
+		std::uniform_real_distribution<float> dist(0, r);
 		return (float)dist(m_Engine);
 	}
 	inline glm::vec3 prGenVec(float r) {
 		while(true) {
-		    glm::vec3 vec(Rand(r), Rand(r), 0.0);
-		    if (glm::l2Norm(vec) > r) continue;
-		    return glm::vec3(vec.x, vec.y, sqrt(1.0f - vec.x * vec.x - vec.y * vec.y));
+		    glm::vec3 vec(Rand(-r, r), 0.0, Rand(-r, r));
+		    if (r * r - vec.x * vec.x - vec.z * vec.z < 0) continue;
+		    return glm::vec3(vec.x, sqrt(r * r - vec.x * vec.x - vec.z * vec.z), vec.z);
 		}
 	}
 	inline static Random& GetInstance() {
