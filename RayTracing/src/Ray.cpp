@@ -20,17 +20,30 @@ float Ray::Hit(Geometry* geo)
 		auto* ball = static_cast<Ball*> (geo);
 		float r = ball->GetRadius();
 		glm::vec3 cent = ball->GetCenter();
-		if (glm::dot(cent - m_Pos, m_Dir) < 0) {
-			// leaving the ball
-			return std::numeric_limits<float>::max();
+		float d = glm::l2Norm(cent - m_Pos);
+		if (d < r) {
+			// Inside the ball
+			//std::cout << "HAAAAAAAAAAAs" << std::endl;
+			double cosine = glm::dot(cent - m_Pos, m_Dir);
+			//float ret = d * cosine + sqrt(d * d * cosine * cosine + r * r - d * d);
+			//float dis = glm::l2Norm(m_Pos + ret * m_Dir - glm::vec3(1, 0, 0));
+		//	assert(fabs(glm::l2Norm(m_Pos + (float)(d * cosine + sqrt(d * d * cosine * cosine + r * r - d * d)) * m_Dir - glm::vec3(1, 0, 0)) - 0.35f) < 1e-4);
+			return d * cosine + sqrt(d * d * cosine * cosine + r * r - d * d);
 		}
-		glm::vec3 diff = glm::perp(cent - m_Pos, m_Dir);
-		if (glm::l2Norm(diff) > r) {
-			// Out of range
-			return std::numeric_limits<float>::max();
+		else {
+			// Outside the ball
+			if (glm::dot(cent - m_Pos, m_Dir) < 0) {
+					// leaving the ball
+					return std::numeric_limits<float>::max();
+			}
+			glm::vec3 diff = glm::perp(cent - m_Pos, m_Dir);
+			if (glm::l2Norm(diff) > r) {
+				// Out of range
+				return std::numeric_limits<float>::max();
+			}
+			glm::vec3 tolen = glm::proj(cent - m_Pos, m_Dir);
+			return glm::l2Norm(tolen) - sqrt(r * r - glm::dot(diff, diff));
 		}
-		glm::vec3 tolen = glm::proj(cent - m_Pos, m_Dir);
-		return glm::l2Norm(tolen) - sqrt(r * r - glm::dot(diff, diff));
 	}
 	case GeoType::Triangle: {
 		assert(fabs(m_Dir.x) < 1.5f);
@@ -41,10 +54,6 @@ float Ray::Hit(Geometry* geo)
 		glm::vec3 pp = glm::proj(triangle->GetPos(0) - m_Pos, norm);
 		if (glm::l2Norm(pp) < 1e-6) {
 			// Too close to the triangle
-			return std::numeric_limits<float>::max();
-		}
-		if (pp.x * norm.x > 0 || pp.y * norm.y > 0 || pp.z * norm.z > 0) {
-			// In the back of the triangle
 			return std::numeric_limits<float>::max();
 		}
 		float cosval = glm::dot(pp, m_Dir) / glm::l2Norm(pp);

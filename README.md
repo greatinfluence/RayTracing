@@ -6,7 +6,7 @@ It's based on Visual Studio 2022.
 
 # Current Performance
 
-![](RayTracing\testpic.png)
+![](testpic.png)
 
 # Used Submodules
 

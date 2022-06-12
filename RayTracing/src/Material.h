@@ -41,3 +41,18 @@ private:
 	glm::vec3 m_Albedo;
 	float m_Fuzz;
 };
+
+class Dieletric : public Material {
+public:
+	Dieletric() : Material(glm::vec3(0.0f)), m_Ir(1.0f) {}
+	Dieletric(float ir) : Material(glm::vec3(0.0f)), m_Ir(ir) {}
+	Dieletric(glm::vec3 gloom, float ir) : Material(gloom), m_Ir(ir) {}
+	float scatter(glm::vec3 pos, glm::vec3 wo, glm::vec3 norm,
+		glm::vec3& attenuation, glm::vec3& wi) override;
+	void SetIr(float ir) { m_Ir = ir; }
+	float GetIr() { return m_Ir; }
+private:
+	float m_Ir; // Index of refraction
+	glm::vec3 refract(glm::vec3 wo, glm::vec3 norm, float eta_ratio);
+	float reflectance(float cosine, float ref_idx);
+};
