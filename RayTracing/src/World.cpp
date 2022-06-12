@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "Random.h"
-#include "Testtool.hpp"
+#include "Testtool.h"
 
 void World::AddGeo(std::shared_ptr<Geometry> geo)
 {

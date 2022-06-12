@@ -1,7 +1,3 @@
-Solve the stratified problem of dielectric mat
-
-
-
-Incorporate YAML
+Fix Shlick's approximation problem
 
 Complete the Cuboid hit detection

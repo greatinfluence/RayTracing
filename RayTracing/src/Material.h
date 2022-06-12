@@ -2,13 +2,21 @@
 
 #include "glm/vec3.hpp"
 
+enum class MatType {
+	None = 0,
+	Diffuse = 1,
+	Metal = 2,
+	Dieletric = 3
+};
+
 class Material {
 public:
 	Material(glm::vec3 glow): m_Glow(glow) {}
 	virtual float scatter(glm::vec3 pos, glm::vec3 wo, glm::vec3 norm,
 		glm::vec3& attenuation, glm::vec3& wi) = 0;
 	void SetGlow(glm::vec3 glow) { m_Glow = glow; }
-	glm::vec3 GetGlow() { return m_Glow; }
+	glm::vec3 GetGlow() const { return m_Glow; }
+	virtual MatType GetType() const = 0;
 protected:
 	glm::vec3 m_Glow;
 };
@@ -22,7 +30,8 @@ public:
 	float scatter(glm::vec3 pos, glm::vec3 wo, glm::vec3 norm,
 		glm::vec3& attenuation, glm::vec3& wi) override;
 	void SetAlbedo(glm::vec3 albedo) { m_Albedo = albedo; }
-	glm::vec3 GetAlbedo() { return m_Albedo; }
+	glm::vec3 GetAlbedo() const { return m_Albedo; }
+	MatType GetType() const override { return MatType::Diffuse; }
 private:
 	glm::vec3 m_Albedo;
 };
@@ -36,7 +45,9 @@ public:
 	float scatter(glm::vec3 pos, glm::vec3 wo, glm::vec3 norm,
 		glm::vec3& attenuation, glm::vec3& wi) override;
 	void SetAlbedo(glm::vec3 albedo) { m_Albedo = albedo; }
-	glm::vec3 GetAlbedo() { return m_Albedo; }
+	glm::vec3 GetAlbedo() const { return m_Albedo; }
+	float GetFuzz() const { return m_Fuzz; }
+	MatType GetType() const override { return MatType::Metal; }
 private:
 	glm::vec3 m_Albedo;
 	float m_Fuzz;
@@ -50,7 +61,8 @@ public:
 	float scatter(glm::vec3 pos, glm::vec3 wo, glm::vec3 norm,
 		glm::vec3& attenuation, glm::vec3& wi) override;
 	void SetIr(float ir) { m_Ir = ir; }
-	float GetIr() { return m_Ir; }
+	float GetIr() const { return m_Ir; }
+	MatType GetType() const override { return MatType::Dieletric; }
 private:
 	float m_Ir; // Index of refraction
 	glm::vec3 refract(glm::vec3 wo, glm::vec3 norm, float eta_ratio);

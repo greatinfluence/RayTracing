@@ -1,4 +1,6 @@
 #include <iostream>
+#include <fstream>
+
 
 #include "Image.h"
 #include "World.h"
@@ -6,19 +8,22 @@
 #include "Geometry.h"
 #include "glm/gtx/norm.hpp"
 
+#include "yaml-cpp/yaml.h"
+#include "Yamlext.h"
+#include "Testtool.h"
+
 int main() {
 	int const Width = 512, Height = 256;
 	int nrays = 800;
 	Image3 img(Width, Height);
-	Camera cam(glm::vec3(0.0f), glm::vec3(1.0f, 0.0f, 0.0f),
-		glm::vec3(0.0f, 1.0f, 0.0f), 1.50f, 1.04f);
+	YAML::Node config = YAML::LoadFile("config.yaml");
+	World world(config["world"].as<World>());
+	Camera cam = world.GetCam();
+	/*
+	//auto config = YAML::LoadFile("src/config.yaml");
+	Camera cam(glm::vec3(0), glm::vec3(1.0f, 0, 0), glm::vec3(0, 1.0f, 0), 1.5f, 1.04f);
 	World world(cam, glm::vec3(1.0f, 1.0f, 1.0f));
-/*	std::shared_ptr<Geometry> bulb(new Ball(glm::vec3(1.5f, 1.0f, 0.0f), 0.2f));
-	auto bmat = std::shared_ptr<Material>(new Diffuse(glm::vec3(0.2f, 0.8f, 0.1f)));
-	bmat->SetGlow(glm::vec3(100.0f));
-	bulb->AddMaterial(bmat);
-	world.AddGeo(bulb);*/
-	std::shared_ptr<Geometry> ball1(new Ball(glm::vec3(1.0f, 0.0f, 0.0f), 0.35f));
+	std::shared_ptr<Geometry> ball1(new Ball(glm::vec3(1.0f, 0.0f, -0.36f), 0.35f));
 	auto mat = std::shared_ptr<Material>(new Dieletric(1.5));
 	ball1->AddMaterial(mat);
 	world.AddGeo(ball1);
@@ -26,9 +31,9 @@ int main() {
 	auto matbk = std::shared_ptr<Material>(new Metal(glm::vec3(0.8f, 0.2f, 0.1f)));
 	ballbk->AddMaterial(matbk);
 	world.AddGeo(ballbk);
-//	std::shared_ptr<Geometry> ball2(new Ball(glm::vec3(1.0f, 0.0f, 0.36f), 0.35f));
-	//ball2->AddMaterial(std::shared_ptr<Material>(new Metal(glm::vec3(0.8f, 0.1f, 0.2f), 0.1)));
-	//world.AddGeo(ball2);
+	std::shared_ptr<Geometry> ball2(new Ball(glm::vec3(1.0f, 0.0f, 0.36f), 0.35f));
+	ball2->AddMaterial(std::shared_ptr<Material>(new Metal(glm::vec3(0.8f, 0.1f, 0.2f), 0.1f)));
+	world.AddGeo(ball2);
 	float fh = -0.35f;
 	float fr = -18.0f, bk = 18.0f;
 	std::shared_ptr<Geometry> fl1(new Triangle(glm::vec3(fr, fh, -3.0f), glm::vec3(bk, fh, 3.0f), glm::vec3(bk, fh, -3.0f)));
@@ -37,6 +42,12 @@ int main() {
 	std::shared_ptr<Geometry> fl2(new Triangle(glm::vec3(fr, fh, -3.0f), glm::vec3(fr, fh, 3.0f), glm::vec3(bk, fh, 3.0f)));
 	fl2->AddMaterial(std::shared_ptr<Material>(new Diffuse(glm::vec3(0.1f, 0.2f, 0.8f))));
 	world.AddGeo(fl2);
+	YAML::Node config;
+	config["world"] = world;
+	std::ofstream fout("src/config.yaml");
+	fout << config;
+	return 0;
+	*/
 /*	
 	float ch = 1.2f;
 	std::shared_ptr<Geometry> lwall1(new Triangle(glm::vec3(-3.0f, fh, -3.0f), glm::vec3(3.0f, fh, -3.0f), glm::vec3(-3.0f, ch, -3.0f)));

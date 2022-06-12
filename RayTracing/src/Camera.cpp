@@ -5,6 +5,9 @@
 
 #include "Random.h"
 
+Camera::Camera()
+	: m_Pos(glm::vec3(0)), m_Front(glm::vec3(1.0f, 0, 0)), m_Up(glm::vec3(0, 1.0f, 0)), m_Horang(1.0f), m_Perang(0.67f) {}
+
 Camera::Camera(glm::vec3 pos, glm::vec3 front, glm::vec3 up, float horang, float perang)
 : m_Pos(pos), m_Front(glm::normalize(front)), m_Up(glm::normalize(up)),
 		m_Horang(horang), m_Perang(perang) {
