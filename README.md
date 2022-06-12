@@ -13,6 +13,7 @@ It's based on Visual Studio 2022.
 - [glm](https://github.com/g-truc/glm) for math support
 - [stb_image](https://github.com/nothings/stb) for picture reading/writing
 - [Dear ImGui](https://github.com/ocornut/imgui) not incorporated yet, maybe will be used someday
+- [YAML cpp](https://github.com/jbeder/yaml-cpp) for scene storage
 
 # Acknowledgement
 
