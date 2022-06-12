@@ -49,9 +49,6 @@ glm::vec3 World::RayTracing(Ray ray, int lev, glm::vec3 coef)
 
 		//	assert(glm::dot(wi, ray.GetDir()) < 1e-8);
 		}*/
-		if (poss > 2.0f || poss < -2.0f) {
-			std::cout << "What?" << std::endl;
-		}
 		if(lev > 4) {
 			float rr = glm::clamp(fmax(coef.r, fmax(coef.g, coef.b)), 0.0f, 0.95f);
 			if (lev > 30 || Random::Rand(1.0f) > rr) return coef * mat->GetGlow();	
@@ -59,9 +56,18 @@ glm::vec3 World::RayTracing(Ray ray, int lev, glm::vec3 coef)
 		//	return coef / rr * mat->GetGlow() +
 		//		RayTracing(Ray(hitpos + wi * 1e-4f, wi), lev + 1, coef * att * fabs(glm::dot(wi, norm)) / poss) / rr;
 		}
-		if (hitted->GetType() == GeoType::Ball) {
+		if (hitted->GetType() == GeoType::Ball && false) {
 			//Debug here
-		//	std::cout << "Hit the ball" << std::endl;
+			std::cout << "Hit the ball" << std::endl;
+			std::cout << "Level: " << lev << std::endl;
+			std::cout << "Wo: " << ray.GetDir();
+			std::cout << "Wi: " << wi;
+			std::cout << "Norm: " << norm;
+			std::cout << "Hitpos: " << hitpos;
+			std::cout << "Dist: " << glm::l2Norm(hitpos - glm::vec3(1.0f, 0, 0)) << std::endl;
+			std::cout << "Sin(wo, norm): " << sqrt(1.0 - glm::dot(ray.GetDir(), norm) * glm::dot(ray.GetDir(), norm)) << std::endl;
+			std::cout << "Sin(wi, norm): " << sqrt(1.0 - glm::dot(wi, norm) * glm::dot(wi, norm)) << std::endl;
+			std::cout << std::endl;
 		}
 		return coef * mat->GetGlow() +
 			RayTracing(Ray(hitpos + wi * 1e-4f, wi), lev + 1, coef * att * fabs(glm::dot(wi, norm)) / poss);

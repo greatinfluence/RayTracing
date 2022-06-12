@@ -7,7 +7,7 @@
 #include "glm/gtx/norm.hpp"
 
 int main() {
-	int const Width = 256, Height = 128;
+	int const Width = 512, Height = 256;
 	int nrays = 800;
 	Image3 img(Width, Height);
 	Camera cam(glm::vec3(0.0f), glm::vec3(1.0f, 0.0f, 0.0f),
@@ -22,6 +22,10 @@ int main() {
 	auto mat = std::shared_ptr<Material>(new Dieletric(1.5));
 	ball1->AddMaterial(mat);
 	world.AddGeo(ball1);
+	std::shared_ptr<Geometry> ballbk(new Ball(glm::vec3(3.0f, -0.2f, 0.0f), 0.15f));
+	auto matbk = std::shared_ptr<Material>(new Metal(glm::vec3(0.8f, 0.2f, 0.1f)));
+	ballbk->AddMaterial(matbk);
+	world.AddGeo(ballbk);
 //	std::shared_ptr<Geometry> ball2(new Ball(glm::vec3(1.0f, 0.0f, 0.36f), 0.35f));
 	//ball2->AddMaterial(std::shared_ptr<Material>(new Metal(glm::vec3(0.8f, 0.1f, 0.2f), 0.1)));
 	//world.AddGeo(ball2);
