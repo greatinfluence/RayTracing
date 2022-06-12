@@ -632,6 +632,7 @@
     <None Include="src\vendor\glm\gtx\vector_angle.inl" />
     <None Include="src\vendor\glm\gtx\vector_query.inl" />
     <None Include="src\vendor\glm\gtx\wrap.inl" />
+    <None Include="twoballsconfig.yaml" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
@@ -677,6 +678,9 @@
     <ClCompile Include="src\vendor\yaml-cpp\src\stream.cpp" />
     <ClCompile Include="src\vendor\yaml-cpp\src\tag.cpp" />
     <ClCompile Include="src\World.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="testpic.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
