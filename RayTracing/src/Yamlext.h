@@ -7,6 +7,7 @@
 #include "Triangle.h"
 #include "Ball.h"
 #include "World.h"
+#include "Image.h"
 
 namespace YAML {
 	template<>
@@ -218,6 +219,26 @@ namespace YAML {
 			for (auto it = geos.begin(); it != geos.end(); ++it) {
 				wd.AddGeo(it->as<std::shared_ptr<Geometry>>());
 			}
+			return true;
+		}
+	};
+
+	template<>
+	struct convert<Image3> {
+		static Node encode(Image3 const& im) {
+			Node node;
+			node["Width"] = im.GetWidth();
+			node["Height"] = im.GetHeight();
+			node["Channels"] = im.GetChannels();
+			node["Filepath"] = im.GetFile();
+			return node;
+		}
+
+		static bool decode(Node const& node, Image3& rhs) {
+			if (!node["Width"] || !node["Height"] || !node["Channels"] || !node["Filepath"]) {
+				return false;
+			}
+			rhs = Image3(node["Width"].as<int>(), node["Height"].as<int>(), node["Filepath"].as<std::string>(), node["Channels"].as<int>());
 			return true;
 		}
 	};

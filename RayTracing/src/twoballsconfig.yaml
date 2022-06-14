@@ -122,3 +122,8 @@ world:
         - 0
         - 1
         - 0
+img:
+  Width: 512
+  Height: 256
+  Channels: 3
+  Filepath: ""

@@ -30,7 +30,6 @@ float Ray::Hit(Geometry* geo)
 			double cosine = glm::dot(glm::normalize(cent - m_Pos), m_Dir);
 			float ret = d * cosine + sqrt(d * d * cosine * cosine + r * r - d * d);
 			float dis = glm::l2Norm(m_Pos + ret * m_Dir - glm::vec3(1, 0, 0));
-			assert(fabs(glm::l2Norm(m_Pos + (float)(d * cosine + sqrt(d * d * cosine * cosine + r * r - d * d)) * m_Dir - glm::vec3(1, 0, 0)) - 0.35f) < 1e-4);
 			return d * cosine + sqrt(d * d * cosine * cosine + r * r - d * d);
 		}
 		else {

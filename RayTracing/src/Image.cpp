@@ -1,14 +1,16 @@
 #include "Image.h"
 
 #include <iostream>
+#include <cstring>
 
 #include "stb_Image/stb_Image.h"
 #include "stb_Image/stb_Image_write.h"
 
-Image3::Image3(int width, int height, std::string filepath, int channels, int deschannels)
-	: m_Width(width), m_Height(height), m_Channels(deschannels)
+Image3::Image3(int width, int height, std::string filepath, int deschannels)
+	: m_Width(width), m_Height(height), m_Channels(deschannels), m_Filepath(filepath), m_Data(nullptr)
 {
 	if (filepath != "") {
+		int channels;
 		m_Data = stbi_load(filepath.c_str(), &m_Width, &m_Height,
 			&channels, deschannels);
 		if (m_Data == nullptr) {
@@ -17,13 +19,47 @@ Image3::Image3(int width, int height, std::string filepath, int channels, int de
 	}
 	else
 	{
-		m_Data = new unsigned char[width * height * channels];
+		m_Data = new unsigned char[width * height * deschannels];
 	}
+}
+
+Image3::Image3(Image3 const& img) noexcept
+	: m_Width(img.m_Width), m_Height(img.m_Height), m_Channels(img.m_Channels), m_Data(nullptr) {
+	int length = m_Width * m_Height * m_Channels;
+	m_Data = new unsigned char[length];
+	memcpy_s(m_Data, length * sizeof(unsigned char), img.m_Data, length * sizeof(unsigned char));
+}
+
+Image3& Image3::operator=(Image3&& img) noexcept {
+	if (img.m_Data != nullptr) {
+		delete[] m_Data;
+	}
+	m_Width = img.m_Width;
+	m_Height = img.m_Height;
+	m_Channels = img.m_Channels;
+	m_Filepath = img.m_Filepath;
+	m_Data = img.m_Data;
+	img.m_Data = nullptr;
+	return *this;
+}
+
+Image3& Image3::operator=(Image3 const& img) noexcept {
+	if (img.m_Data != nullptr) {
+		delete[] m_Data;
+	}
+	m_Width = img.m_Width;
+	m_Height = img.m_Height;
+	m_Channels = img.m_Channels;
+	m_Filepath = img.m_Filepath;
+	int length = m_Width * m_Height * m_Channels;
+	m_Data = new unsigned char[length];
+	memcpy_s(m_Data, length * sizeof(unsigned char), img.m_Data, length * sizeof(unsigned char));
+	return *this;
 }
 
 Image3::~Image3()
 {
-	delete[] m_Data;
+	if(m_Data != nullptr) delete[] m_Data;
 }
 
 void Image3::Setcol(int x, int y, glm::vec3 col, bool regularize)

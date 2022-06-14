@@ -13,12 +13,12 @@
 #include "Testtool.h"
 
 int main() {
-	int const Width = 512, Height = 256;
 	int nrays = 800;
-	Image3 img(Width, Height);
-	YAML::Node config = YAML::LoadFile("config.yaml");
+	YAML::Node config = YAML::LoadFile("twoballsconfig.yaml");
+	Image3 img(config["img"].as<Image3>());
 	World world(config["world"].as<World>());
 	Camera cam = world.GetCam();
+	int const Width = img.GetWidth(), Height = img.GetHeight();
 	/*
 	//auto config = YAML::LoadFile("src/config.yaml");
 	Camera cam(glm::vec3(0), glm::vec3(1.0f, 0, 0), glm::vec3(0, 1.0f, 0), 1.5f, 1.04f);
