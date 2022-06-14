@@ -136,6 +136,7 @@
     <ClInclude Include="src\Cuboid.h" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Random.h" />
+    <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\Testtool.h" />
     <ClInclude Include="src\Triangle.h" />
     <ClInclude Include="src\Geometry.h" />
@@ -642,6 +643,7 @@
     <ClCompile Include="src\Image.cpp" />
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Ray.cpp" />
+    <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\Testtool.cpp" />
     <ClCompile Include="src\Triangle.cpp" />
     <ClCompile Include="src\vendor\glm\detail\glm.cpp" />

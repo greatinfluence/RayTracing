@@ -16,8 +16,7 @@ Camera::Camera(glm::vec3 pos, glm::vec3 front, glm::vec3 up, float horang, float
 	}
 }
 
-void Camera::GenRay(int x, int y, int width, int height, std::vector<Ray>& rays, int num)
-{
+void Camera::GenRay(int x, int y, int width, int height, std::vector<Ray>& rays, int num) const {
 	float xl = ((float)x) / width, xr = ((float)x + 1) / width;
 	float yl = ((float)y) / height, yr = ((float)y + 1) / height;
 	float lb = (float)atan((xl - 0.5) * 2 * tan(m_Horang / 2)),

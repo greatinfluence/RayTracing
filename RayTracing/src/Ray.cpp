@@ -9,8 +9,7 @@
 Ray::Ray(glm::vec3 pos, glm::vec3 dir)
 	: m_Pos(pos), m_Dir(glm::normalize(dir)) {}
 
-float Ray::Hit(Geometry* geo)
-{
+float Ray::Hit(Geometry* geo) const {
 	if (geo == nullptr) {
 		std::cout << "Ray::Hit Error: Received nullptr" << std::endl;
 		return -1;
