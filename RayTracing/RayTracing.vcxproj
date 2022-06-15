@@ -494,6 +494,7 @@
     <ClInclude Include="src\Yamlext.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="102ballsconfig.yaml" />
     <None Include="src\twoballsconfig.yaml" />
     <None Include="src\vendor\glm\detail\func_common.inl" />
     <None Include="src\vendor\glm\detail\func_common_simd.inl" />
@@ -684,6 +685,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="testpic.png" />
+    <Image Include="testpic2.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

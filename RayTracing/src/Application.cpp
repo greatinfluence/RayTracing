@@ -6,7 +6,7 @@
 #include "Random.h"
 
 int main() {
-	int nrays = 1;
+	int nrays = 32;
 	YAML::Node config = YAML::LoadFile("102ballsconfig.yaml");
 	Image3 img(config["img"].as<Image3>());
 	World world(config["world"].as<World>());
@@ -36,7 +36,7 @@ int main() {
 	ofs << config;
 	return 0;*/
 	Renderer renderer;
-	renderer.Render(world, img, 800);
+	renderer.Render(world, img, nrays);
 	img.Write("testpic2.png");
 	return 0;
 }

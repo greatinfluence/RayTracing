@@ -1519,6 +1519,7 @@
     </None>
     <None Include="src\twoballsconfig.yaml" />
     <None Include="twoballsconfig.yaml" />
+    <None Include="102ballsconfig.yaml" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\vendor\glm\detail\glm.cpp">
@@ -1656,6 +1657,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="testpic.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="testpic2.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
