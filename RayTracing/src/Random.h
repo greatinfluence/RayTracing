@@ -10,10 +10,19 @@
 
 class Random {
 public:
+	// Rand(l, r) produces uniformly scattered random numbers in [l, r]
 	inline static float Rand(float l, float r) { return GetInstance().prRand(l, r); }
+	
+	// Rand(r) produces uniformly scattered random numbers in [0, r]
 	inline static float Rand(float r) { return GetInstance().prRand(r); }
+
+	// RandinDisc(r) produces 3D vectors with x, y axis randomly scattered in the disc with radius r
 	inline static glm::vec3 RandinDisc(float r) { return GetInstance().prRandinDisc(r); }
+
+	// RandinSphere(r) produces 3D vectors randomly scattered in the sphere with radius r
 	inline static glm::vec3 RandinSphere(float r) { return GetInstance().prRandinSphere(r); }
+
+	// RandinHemisphere(norm, r) produces 3D vectors randomly scattered in the hemisphere with radius r, normal direction norm
 	inline static glm::vec3 RandinHemisphere(glm::vec3 norm, float r) {
 		auto vec = RandinSphere(r);
 		if (glm::dot(vec, norm) < 0) return -vec;
@@ -37,7 +46,7 @@ private:
 		float theta = prRand(2 * pi);
 		float rad = prRand(r);
 		rad = sqrt(rad);
-		return glm::vec3(rad * cos(theta), sqrt(r * r - rad * rad), rad * sin(theta));
+		return glm::vec3(rad * cos(theta), sqrt(sq(r) - sq(rad)), rad * sin(theta));
 	}
 
 	inline glm::vec3 prRandinSphere(float r) {

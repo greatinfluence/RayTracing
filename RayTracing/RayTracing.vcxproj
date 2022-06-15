@@ -646,6 +646,7 @@
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Ray.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
+    <ClCompile Include="src\Settings.cpp" />
     <ClCompile Include="src\Testtool.cpp" />
     <ClCompile Include="src\Triangle.cpp" />
     <ClCompile Include="src\vendor\glm\detail\glm.cpp" />

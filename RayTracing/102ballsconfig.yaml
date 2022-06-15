@@ -1525,7 +1525,7 @@ world:
         - 0.799999952
       Radius: 0.100000001
 img:
-  Width: 512
-  Height: 256
+  Width: 1024
+  Height: 512
   Channels: 3
   Filepath: ""

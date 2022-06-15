@@ -7,6 +7,9 @@ public:
 	Camera();
 	Camera(glm::vec3 pos, glm::vec3 front, glm::vec3 up,
 		float horang = 1.57, float perang = 1.57);
+
+	// Genray(x, y, width, height, rays, num) generates num rays on the positioned direction,
+	//     place all the generated rays into the vector rays
 	void GenRay(int x, int y, int width, int height, std::vector<Ray>& rays, int num = 4) const;
 
 	glm::vec3 GetPos() const { return m_Pos; }

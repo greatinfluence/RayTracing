@@ -1,11 +1,29 @@
 #pragma once
 
-constexpr float pi = 3.14159265358979f;
-
+#include <limits>
 #include <string>
 #include <chrono>
 
-// Copied from https://stackoverflow.com/questions/42138599/how-to-format-stdchrono-durations
+
+// pi
+constexpr float pi = 3.14159265358979f;
+
+// The accuracy epsilon
+constexpr float eps = 1e-6f;
+
+// Float's upperbound
+constexpr float floatmax = std::numeric_limits<float>().max();
+
+// Float's lowerbound
+constexpr float floatmin = std::numeric_limits<float>().min();
+
+// sq(x) returns x * x
+float sq(float x);
+
+/*
+    formatDuration(d) formats the time duration into the form xx:xx:xx
+    Copied from https://stackoverflow.com/questions/42138599/how-to-format-stdchrono-durations
+*/
 template<class DurationIn, class FirstDuration, class...RestDurations>
 std::string formatDuration(DurationIn d)
 {

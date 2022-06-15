@@ -12,6 +12,10 @@ enum class MatType {
 class Material {
 public:
 	Material(glm::vec3 glow): m_Glow(glow) {}
+
+	// scatter(pos, wo, norm, attenuation, wi) will compute the scattered ray's direction
+	//     and it's strength attenuation, save them into wi and attenuation.
+	//     returns the possibility of the ray to be generated relative to uniform distribution
 	virtual float scatter(glm::vec3 pos, glm::vec3 wo, glm::vec3 norm,
 		glm::vec3& attenuation, glm::vec3& wi) = 0;
 	void SetGlow(glm::vec3 glow) { m_Glow = glow; }
@@ -65,6 +69,10 @@ public:
 	MatType GetType() const override { return MatType::Dieletric; }
 private:
 	float m_Ir; // Index of refraction
+
+	// refract(wo, norm, eta_ratio) computes the refracted light's direction
 	glm::vec3 refract(glm::vec3 wo, glm::vec3 norm, float eta_ratio);
+
+	// reflectance(cosine, ref_idx) computes the reflectance rate using Schlick's approximation
 	float reflectance(float cosine, float ref_idx);
 };
