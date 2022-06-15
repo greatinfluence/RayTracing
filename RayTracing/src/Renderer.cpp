@@ -3,6 +3,7 @@
 #include <iostream>
 
 void Renderer::Render(World& world, Image3& output, int nrays, int OutputFreq) {
+	world.CreateHierarchy();
 	Camera const& cam = world.GetCam();
 	int const Width = output.GetWidth(), Height = output.GetHeight();
 	std::vector<Ray> rays;
@@ -10,7 +11,7 @@ void Renderer::Render(World& world, Image3& output, int nrays, int OutputFreq) {
 		for (auto j = 0; j < Height; ++j) {
 			cam.GenRay(i, j, Width, Height, rays, nrays);
 			auto col = glm::vec3(0.0f);
-			for (auto ray : rays) {
+			for (Ray const& ray : rays) {
 				col += world.RayTracing(ray);
 			}
 			col = col / (float)nrays;

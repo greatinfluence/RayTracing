@@ -9,7 +9,7 @@
 class Ray {
 public:
 	Ray(glm::vec3 pos, glm::vec3 dir);
-	float Hit(Geometry* geo) const;
+	float Hit(Geometry const* geo) const;
 	glm::vec3 GetPos() const { return m_Pos; }
 	glm::vec3 GetDir() const { return m_Dir; }
 private:

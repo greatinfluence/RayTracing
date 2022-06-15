@@ -2,9 +2,12 @@
 
 #include <limits>
 #include <iostream>
+#include <algorithm>
 
 #include "Random.h"
 #include "Testtool.h"
+#include "Triangle.h"
+#include "Ball.h"
 
 void World::AddGeo(std::shared_ptr<Geometry> geo)
 {
@@ -18,13 +21,7 @@ glm::vec3 World::RayTracing(Ray ray, int lev, glm::vec3 coef)
 	if (fabs(ray.GetDir().x) > 1.5f) {
 		std::cout << "What?" << std::endl;
 	}
-	for (auto geo : m_Geos) {
-		float ndis = ray.Hit(geo.get());
-		if (ndis < dist) {
-			dist = ndis;
-			hitted = geo;
-		}
-	}
+	m_Root->TestHit(ray, dist, hitted);
 	if (hitted != nullptr) {
 		glm::vec3 hitpos = ray.GetPos() + ray.GetDir() * dist;
 		glm::vec3 att, wi, norm = hitted->GetNorm(hitpos);
@@ -56,21 +53,93 @@ glm::vec3 World::RayTracing(Ray ray, int lev, glm::vec3 coef)
 		//	return coef / rr * mat->GetGlow() +
 		//		RayTracing(Ray(hitpos + wi * 1e-4f, wi), lev + 1, coef * att * fabs(glm::dot(wi, norm)) / poss) / rr;
 		}
-		if (hitted->GetType() == GeoType::Ball && false) {
-			//Debug here
-			std::cout << "Hit the ball" << std::endl;
-			std::cout << "Level: " << lev << std::endl;
-			std::cout << "Wo: " << ray.GetDir();
-			std::cout << "Wi: " << wi;
-			std::cout << "Norm: " << norm;
-			std::cout << "Hitpos: " << hitpos;
-			std::cout << "Dist: " << glm::l2Norm(hitpos - glm::vec3(1.0f, 0, 0)) << std::endl;
-			std::cout << "Sin(wo, norm): " << sqrt(1.0 - glm::dot(ray.GetDir(), norm) * glm::dot(ray.GetDir(), norm)) << std::endl;
-			std::cout << "Sin(wi, norm): " << sqrt(1.0 - glm::dot(wi, norm) * glm::dot(wi, norm)) << std::endl;
-			std::cout << std::endl;
-		}
 		return coef * mat->GetGlow() +
 			RayTracing(Ray(hitpos + wi * 1e-4f, wi), lev + 1, coef * att * fabs(glm::dot(wi, norm)) / poss);
 	}
 	else return coef * m_Background;
+}
+
+void World::ComputeInfo(Geometry* geo, glm::vec3& cent, float& area) {
+	switch (geo->GetType()) {
+	case GeoType::Ball: {
+		auto* ball = static_cast<Ball*>(geo);
+		cent = ball->GetCenter();
+		area = (float)(4 * pi * pow(ball->GetRadius(), 2));
+		break;
+	}
+	case GeoType::Triangle: {
+		auto* tri = static_cast<Triangle*>(geo);
+		cent = (tri->GetPos(0) + tri->GetPos(1) + tri->GetPos(2)) / 3.0f;
+		area = glm::l2Norm(glm::cross(tri->GetPos(1) - tri->GetPos(0), tri->GetPos(2) - tri->GetPos(0))) / 2.0f;
+		break;
+	}
+	default: {
+		std::cout << "Cuboid Error: Unknown Geometry type" << std::endl;
+	}
+	}
+}
+
+constexpr int MAXOBJ = 10;
+
+std::shared_ptr<Cuboid> World::DoCreateHierarchy(std::vector<Object>::iterator beg, std::vector<Object>::iterator ed)
+{
+	std::cout << ed - beg << std::endl;
+	if (ed - beg <= MAXOBJ) {
+		// Only a few objects, just form a single node
+		auto* cub = new Cuboid();
+		for (auto obj = beg; obj < ed; ++obj) {
+			cub->AppendSubGeo(std::shared_ptr<Geometry>(obj->geo));
+		}
+		return std::shared_ptr<Cuboid>(cub);
+	}
+	// Otherwise, find the best setting
+	int bestdim = 0, bestpos = 0;
+	float Fbest = std::numeric_limits<float>().max();
+	float Stot = 0;
+	for (auto j = beg; j < ed; ++j) {
+		Stot += j->area;
+	}
+	int n = (int)(ed - beg); // The number of elements in this section
+	for (auto i = 0; i < 3; ++i) {
+		// enumerate each dimensions
+		// Sort the objects by dim-i
+		float Sleft = 0;
+		float Fmin = std::numeric_limits<float>().max(); // F = Sl*l+(Stot-Sl)*(n-l)
+		int bpos = 0; // record the best break pos
+
+		// Use .geo as the second parameter to make sure the sorting along the axis will always give the same outcome
+		std::sort(beg, ed, [i](Object x, Object y)
+			{return x.cent[i] < y.cent[i] || x.cent[i] == y.cent[i] && x.geo < y.geo;});
+		for (auto j = beg; j < ed - 1; ++j) {
+			Sleft += j->area;
+			float F = Sleft * (j - beg) + (Stot - Sleft) * (ed - j);
+			if(F < Fmin) {
+				Fmin = F;
+				bpos = (int)(j - beg) + 1;
+			}
+		}
+		if (Fmin < Fbest) {
+			Fbest = Fmin;
+			bestpos = bpos;
+			bestdim = i;
+		}
+	}
+	std::sort(beg, ed, [bestdim](Object x, Object y)
+		{return x.cent[bestdim] < y.cent[bestdim] || x.cent[bestdim] == y.cent[bestdim] && x.geo < y.geo;});
+	auto* cub = new Cuboid();
+	auto cl = DoCreateHierarchy(beg, beg + bestpos);
+	auto cr = DoCreateHierarchy(beg + bestpos, ed);
+	cub->AppendSubGeo(cl);
+	cub->AppendSubGeo(cr);
+	return std::shared_ptr<Cuboid>(cub);
+}
+
+
+
+void World::CreateHierarchy() {
+	if (m_Root != nullptr) {
+		// The hierarchy has already been built
+		return;
+	}
+	m_Root = DoCreateHierarchy(m_Geos.begin(), m_Geos.end());
 }

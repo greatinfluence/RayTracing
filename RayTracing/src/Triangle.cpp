@@ -11,15 +11,14 @@ Triangle::Triangle(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, glm::vec3 norm)
 	}
 }
 
-glm::vec3 Triangle::GetPos(size_t ind)
-{
+glm::vec3 Triangle::GetPos(size_t ind) const {
 	if (ind >= 3) {
 		std::cout << "Triangle::getpos Out of range" << std::endl;
 	}
 	return *(m_Vertices + ind);
 }
 
-bool Triangle::OnTriangle(glm::vec3 pos)
+bool Triangle::OnTriangle(glm::vec3 pos) const
 {
 	auto ed1 = m_Vertices[1] - m_Vertices[0], ed2 = m_Vertices[2] - m_Vertices[0];
 	auto vec = pos - m_Vertices[0];

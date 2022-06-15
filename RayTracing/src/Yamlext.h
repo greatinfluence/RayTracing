@@ -196,7 +196,10 @@ namespace YAML {
 			Node node;
 			node["Camera"] = wd.GetCam();
 			node["Background"] = wd.GetBackground();
-			node["Geos"] = wd.GetGeos();
+			auto ngeo = wd.GetNgeo();
+			for (auto i = 0; i < ngeo; ++i) {
+				node["Geos"][i] = wd.GetGeo(i);
+			}
 			return node;
 		}
 		
