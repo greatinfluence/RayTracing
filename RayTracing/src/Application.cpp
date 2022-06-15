@@ -6,14 +6,14 @@
 #include "Random.h"
 
 int main() {
-	int nrays = 32;
+	int nrays = 800;
 	YAML::Node config = YAML::LoadFile("102ballsconfig.yaml");
 	Image3 img(config["img"].as<Image3>());
 	World world(config["world"].as<World>());
 	/*
 	for (auto i = 0; i < 10; ++i)
 		for (auto j = 0; j < 10; ++ j) {
-		auto ball = std::shared_ptr<Geometry>(new Ball(glm::vec3(1.4f, i / 5.0f - 0.35, j / 5.0f - 0.5f), 0.1f));
+		auto ball = std::shared_ptr<Geometry>(new Ball(glm::vec3(1.4f, i / 5.0f - 0.25, j / 5.0f - 1.0f), 0.1f));
 		if ((i + j) % 3 == 0) {
 			ball->AddMaterial(
 				std::shared_ptr<Material>
@@ -36,7 +36,11 @@ int main() {
 	ofs << config;
 	return 0;*/
 	Renderer renderer;
-	renderer.Render(world, img, nrays);
+	auto start = std::chrono::high_resolution_clock::now();
+	renderer.Render(world, img, nrays, 3000);
 	img.Write("testpic2.png");
+	auto stop = std::chrono::high_resolution_clock::now();
+	std::cout << "Rendering finished. Time using: ";
+	std::cout << std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count() << " ms" << std::endl;
 	return 0;
 }

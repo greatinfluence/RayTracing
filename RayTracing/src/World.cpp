@@ -83,7 +83,6 @@ constexpr int MAXOBJ = 10;
 
 std::shared_ptr<Cuboid> World::DoCreateHierarchy(std::vector<Object>::iterator beg, std::vector<Object>::iterator ed)
 {
-	std::cout << ed - beg << std::endl;
 	if (ed - beg <= MAXOBJ) {
 		// Only a few objects, just form a single node
 		auto* cub = new Cuboid();
