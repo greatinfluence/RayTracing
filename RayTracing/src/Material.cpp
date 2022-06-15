@@ -69,9 +69,9 @@ float Dieletric::scatter(glm::vec3 pos, glm::vec3 wo, glm::vec3 norm, glm::vec3&
 {
     attenuation = glm::vec3(1.0f);
     float cosine = glm::dot(wo, norm);
-    float sine = sqrt(1.0 - cosine * cosine);
-    float ref_idx = cosine > 0.0 ? (1.0 / m_Ir) : m_Ir;
-    float poss = ref_idx * sine > 1.0f ? 1 : reflectance(fabs(cosine), ref_idx);
+    float sine = (float)sqrt(1.0 - cosine * cosine);
+    float ref_idx = cosine > 0.0f ? (1.0f / m_Ir) : m_Ir;
+    float poss = ref_idx * sine > 1.0f ? 1.0f : reflectance(fabs(cosine), ref_idx);
     if (ref_idx * sine > 1.0f || Random::Rand(1.0f) < poss) {
         // Reflect
         wi = glm::reflect(-wo, norm);
@@ -101,5 +101,5 @@ float Dieletric::reflectance(float cosine, float ref_idx)
     // Schlick's approximation for reflectance
     auto r0 = (1 - ref_idx) / (1 + ref_idx);
     r0 = r0 * r0;
-    return r0 + (1 - r0) * pow(1 - cosine, 5);
+    return (float)(r0 + (1 - r0) * pow(1 - cosine, 5));
 }

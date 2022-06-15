@@ -6,8 +6,7 @@
 
 #include "glm/gtx/norm.hpp"
 #include "glm/vec3.hpp"
-
-float constexpr pi = 3.14159265358979323846f;
+#include "Settings.h"
 
 class Random {
 public:

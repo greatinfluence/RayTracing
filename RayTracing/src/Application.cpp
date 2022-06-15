@@ -3,7 +3,7 @@
 
 #include "Yamlext.h"
 #include "Renderer.h"
-#include "Random.h"
+#include "Settings.h"
 
 int main() {
 	int nrays = 800;
@@ -35,12 +35,14 @@ int main() {
 	std::ofstream ofs("102ballsconfig.yaml");
 	ofs << config;
 	return 0;*/
+	using namespace std::chrono;
 	Renderer renderer;
-	auto start = std::chrono::high_resolution_clock::now();
+	auto start = high_resolution_clock::now();
 	renderer.Render(world, img, nrays, 3000);
 	img.Write("testpic2.png");
-	auto stop = std::chrono::high_resolution_clock::now();
+	auto stop = high_resolution_clock::now();
 	std::cout << "Rendering finished. Time using: ";
-	std::cout << std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count() << " ms" << std::endl;
+
+	std::cout << formatDuration<decltype(stop - start), hours, minutes, seconds, milliseconds>(stop - start) << std::endl;
 	return 0;
 }
