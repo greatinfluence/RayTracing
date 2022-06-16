@@ -6,7 +6,7 @@
 #include "Settings.h"
 
 int main() {
-	int nrays = 800;
+	int nrays = 1024;
 	YAML::Node config = YAML::LoadFile("102ballsconfig.yaml");
 	Image3 img(config["img"].as<Image3>());
 	World world(config["world"].as<World>());
@@ -38,7 +38,7 @@ int main() {
 	using namespace std::chrono;
 	Renderer renderer;
 	auto start = high_resolution_clock::now();
-	renderer.Render(world, img, nrays, 3000);
+	renderer.Render(world, img, nrays, 2500);
 	img.Write("testpic2.png");
 	auto stop = high_resolution_clock::now();
 	std::cout << "Rendering finished. Time using: ";
