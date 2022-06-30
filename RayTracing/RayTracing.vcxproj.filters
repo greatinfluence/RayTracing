@@ -1098,6 +1098,9 @@
     <ClInclude Include="src\vendor\yaml-cpp\src\token.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Materialrepository.cuh">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\vendor\glm\detail\func_common.inl">
@@ -1665,5 +1668,8 @@
     <Image Include="testpic2.png">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="src\Materialrepository.cu" />
   </ItemGroup>
 </Project>
