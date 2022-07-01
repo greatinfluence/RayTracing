@@ -141,7 +141,7 @@ namespace YAML {
 			}
 			Node node;
 			node["Type"] = geo->GetType();
-			node["Material"] = geo->GetMaterial();
+			node["Material"] = geo->GetMatid();
 			switch (geo->GetType()) {
 			case GeoType::Ball: {
 				auto ball = static_cast<Ball*>(geo.get());
@@ -185,7 +185,7 @@ namespace YAML {
 				return false;
 			}
 			}
-			rhs->AddMaterial(node["Material"].as<std::shared_ptr<Material>>());
+			rhs->AddMaterial(node["Material"].as<uint32_t>());
 			return true;
 		}
 	};

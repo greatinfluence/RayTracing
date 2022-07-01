@@ -1,7 +1,6 @@
 #include "World.h"
 
 #include <limits>
-#include <iostream>
 #include <algorithm>
 
 #include "Random.h"
@@ -19,20 +18,19 @@ glm::vec3 World::RayTracing(Ray ray, int lev, glm::vec3 coef)
 	float dist = std::numeric_limits<float>::max();
 	std::shared_ptr<Geometry> hitted = nullptr;
 	if (fabs(ray.GetDir().x) > 1.5f) {
-		std::cout << "What?" << std::endl;
+		printf("What?\n");
 	}
 	m_Root->TestHit(ray, dist, hitted);
 	if (hitted != nullptr) {
 		glm::vec3 hitpos = ray.GetPos() + ray.GetDir() * dist;
 		glm::vec3 att, wi, norm = hitted->GetNorm(hitpos);
-		std::shared_ptr<Material> mat = hitted->GetMaterial();
+		Material* mat = hitted->GetMaterial();
 		float poss = mat->scatter(hitpos, -ray.GetDir(),
 			norm, att, wi);
-		//std::cout << "Hittttttttttttttttttttttttt" << std::endl;
 		//std::cout << coef * att * glm::dot(wi, norm) / poss << std::endl;
 		if (fabs(dist) > 1e3 || fabs(ray.GetDir().x) > 1.5f) {
 			// Impossible!
-			std::cout << "What?" << std::endl;
+			printf("What?\n");
 		}
 		/*if (hitted->GetType() == GeoType::Ball && lev == 1) {
 			std::cout << "Ray Dir: " << ray.GetDir();
@@ -74,7 +72,7 @@ void World::ComputeInfo(Geometry* geo, glm::vec3& cent, float& area) {
 		break;
 	}
 	default: {
-		std::cout << "Cuboid Error: Unknown Geometry type" << std::endl;
+		printf("Cuboid Error: Unknown Geometry type\n");
 	}
 	}
 }

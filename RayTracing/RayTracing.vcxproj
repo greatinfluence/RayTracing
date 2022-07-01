@@ -151,8 +151,9 @@
     <ClInclude Include="src\Ball.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Cuboid.h" />
+    <ClInclude Include="src\Fileoperator.h" />
     <ClInclude Include="src\Material.h" />
-    <ClInclude Include="src\Materialrepository.cuh" />
+    <ClInclude Include="src\Materialrepository.h" />
     <ClInclude Include="src\Random.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\Settings.h" />
@@ -512,7 +513,6 @@
     <ClInclude Include="src\Yamlext.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="102ballsconfig.yaml" />
     <CudaCompile Include="src\Materialrepository.cu">
       <FileType>Document</FileType>
     </CudaCompile>
@@ -656,13 +656,11 @@
     <None Include="src\vendor\glm\gtx\vector_angle.inl" />
     <None Include="src\vendor\glm\gtx\vector_query.inl" />
     <None Include="src\vendor\glm\gtx\wrap.inl" />
-    <None Include="twoballsconfig.yaml" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Cuboid.cpp" />
-    <ClCompile Include="src\Geometry.cpp" />
     <ClCompile Include="src\Image.cpp" />
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Ray.cpp" />

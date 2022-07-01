@@ -4,8 +4,9 @@
 #include <memory>
 
 #include "glm/vec3.hpp"
+#include "device_launch_parameters.h"
 
-#include "Material.h"
+#include "Materialrepository.h"
 
 enum class GeoType {
 	Unknown = 0, Triangle = 1, Ball = 2, Cuboid = 3
@@ -13,18 +14,23 @@ enum class GeoType {
 
 class Geometry {
 public:
+	Geometry() : m_Matid(0u) {}
 	virtual ~Geometry() = default;
 
 	// GetType() returns the type of the geometry
-	virtual GeoType GetType() const = 0;
+	__host__ __device__ virtual GeoType GetType() const = 0;
 
 	// GetNorm(pos) returns the normal vector of the geometry at position pos
-	virtual glm::vec3 GetNorm(glm::vec3 pos) const = 0;
+	__host__ __device__ virtual glm::vec3 GetNorm(glm::vec3 pos) const = 0;
 
-	std::shared_ptr<Material> GetMaterial() const { return m_Mat; }
+	__host__ __device__ Material* GetMaterial() const { return Materialrepository::GetMat(m_Matid); }
+
+	uint32_t GetMatid() const { return m_Matid; }
 
 	// AddMaterial(mat) adds the material to the geometry
-	void AddMaterial(std::shared_ptr<Material> mat);
+	void AddMaterial(uint32_t matid) {
+		m_Matid = matid;
+	}
 protected:
-	std::shared_ptr<Material> m_Mat;
+	uint32_t m_Matid;
 };
