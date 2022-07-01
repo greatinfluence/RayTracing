@@ -7,6 +7,25 @@
 #include "glm/gtx/norm.hpp"
 #include "glm/vec3.hpp"
 #include "Settings.h"
+#include "device_launch_parameters.h"
+#include "curand_kernel.h"
+
+namespace GPURandom {
+	// Rand(l, r, state) produces uniformly scattered random numbers in [l, r]
+	__device__ float Rand(float l, float r, curandState& state);
+
+	// Rand(r, state) produces uniformly scattered random numbers in [0, r]
+	__device__ float Rand(float r, curandState& state);
+
+	// RandinDisc(r, state) produces 3D vectors with x, y axis randomly scattered in the disc with radius r
+	__device__ glm::vec3 RandinDisc(float r, curandState& state);
+
+	// RandinSphere(r, state) produces 3D vectors randomly scattered in the sphere with radius r
+	__device__ glm::vec3 RandinSphere(float r, curandState& state);
+
+	// RandinHemisphere(norm, r, state) produces 3D vectors randomly scattered in the hemisphere with radius r, normal direction norm
+	__device__ glm::vec3 RandinHemisphere(glm::vec3 norm, float r, curandState& state);
+}
 
 class Random {
 public:

@@ -65,7 +65,7 @@ void Cuboid::AppendSubGeos(World const& world, std::vector<size_t> const& subgeo
 
 __host__ __device__ glm::vec3 Cuboid::GetNorm(glm::vec3 pos) const
 {
-	std::cout << "You should never Call Cuboid::GetNorm(), since it's just a structural function" << std::endl;
+	printf("You should never call this function, since it's just a structural function\n");
 	return glm::vec3(0.0f);
 }
 

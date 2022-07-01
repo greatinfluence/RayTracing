@@ -12,10 +12,10 @@ public:
 	void AddGeo(std::shared_ptr<Geometry> geo);
 	
 	// RayTracing(ray, lev, coef) traces the ray and returns the color seen by the ray
-	glm::vec3 RayTracing(Ray ray, int lev = 1, glm::vec3 coef = glm::vec3(1.0f));
+	__host__ __device__ glm::vec3 RayTracing(Ray ray, int lev = 1, glm::vec3 coef = glm::vec3(1.0f));
 
-	Camera const& GetCam() const { return m_Cam; }
-	glm::vec3 GetBackground() const { return m_Background; }
+	__host__ __device__ Camera const& GetCam() const { return m_Cam; }
+	__host__ __device__ glm::vec3 GetBackground() const { return m_Background; }
 
 	// GetNgeo() returns the number of geometries in the world
 	size_t GetNgeo() const { return m_Geos.size(); }

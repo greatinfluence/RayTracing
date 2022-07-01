@@ -14,7 +14,7 @@ void World::AddGeo(std::shared_ptr<Geometry> geo)
 	m_Geos.push_back(geo);
 }
 
-glm::vec3 World::RayTracing(Ray ray, int lev, glm::vec3 coef)
+__host__ __device__ glm::vec3 World::RayTracing(Ray ray, int lev, glm::vec3 coef)
 {
 	float dist = std::numeric_limits<float>::max();
 	Geometry* hitted = nullptr;
@@ -98,7 +98,7 @@ size_t World::DoCreateHierarchy(size_t beg, size_t ed) {
 		return m_Geos.size() - 1;
 	}
 	// Otherwise, find the best setting
-	int bestdim = 0, bestpos = 0;
+	size_t bestdim = 0, bestpos = 0;
 	float Fbest = std::numeric_limits<float>().max();
 	float Stot = 0;
 	for (size_t j = beg; j < ed; ++j) {

@@ -22,9 +22,9 @@ void Materialrepository::CleanMemory() {
 	size_t size = m_Mats.size();
 	if (g_Mats_cpu != nullptr) {
 		for (size_t i = 0; i < size; ++i) {
-			cudaFree(g_Mats_cpu[i]);
-			cudaFree(g_Mats_cpu);
+			checkCudaErrors(cudaFree(g_Mats_cpu[i]));
 		}
+		checkCudaErrors(cudaFree(g_Mats_cpu));
 	}
 }
 
@@ -36,7 +36,7 @@ void Materialrepository::Sendtogpu() {
 	cudaMallocManaged(&g_Mats_cpu, sizeof(Material*) * size);
 	for (auto i = 0; i < size; ++i) {
 		cudaMalloc(&(g_Mats_cpu[i]), sizeof(*m_Mats[i]));
-		cudaMemcpy(g_Mats_cpu[i], m_Mats[i].get(), sizeof(*m_Mats[i]),
+		cudaMemcpy(g_Mats_cpu[i], m_Mats[i].get(), m_Mats[i] -> GetSize(),
 			cudaMemcpyKind::cudaMemcpyHostToDevice);
 	}
 	cudaMemcpy(&g_Mats, &g_Mats_cpu, sizeof(Material**), cudaMemcpyKind::cudaMemcpyHostToDevice);

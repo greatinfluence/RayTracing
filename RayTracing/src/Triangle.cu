@@ -13,7 +13,7 @@ Triangle::Triangle(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, glm::vec3 norm)
 
 glm::vec3 Triangle::GetPos(size_t ind) const {
 	if (ind >= 3) {
-		std::cout << "Triangle::getpos Out of range" << std::endl;
+		printf("Triangle::getpos Out of range\n");
 	}
 	return *(m_Vertices + ind);
 }

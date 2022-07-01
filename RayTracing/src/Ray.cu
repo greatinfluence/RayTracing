@@ -11,9 +11,9 @@
 Ray::Ray(glm::vec3 pos, glm::vec3 dir)
 	: m_Pos(pos), m_Dir(glm::normalize(dir)) {}
 
-float Ray::Hit(Geometry const* geo) const {
+__host__ __device__ float Ray::Hit(Geometry const* geo) const {
 	if (geo == nullptr) {
-		std::cout << "Ray::Hit Error: Received nullptr" << std::endl;
+		printf("Ray::Hit error: Received nullptr\n");
 		return -1;
 	}
 	switch (geo->GetType()) {
@@ -34,13 +34,13 @@ float Ray::Hit(Geometry const* geo) const {
 		else {
 			// Outside the ball
 			if (glm::dot(cent - m_Pos, m_Dir) < 0) {
-					// leaving the ball
-					return std::numeric_limits<float>::max();
+				// leaving the ball
+				return floatmax;
 			}
 			glm::vec3 diff = glm::perp(cent - m_Pos, m_Dir);
 			if (glm::l2Norm(diff) > r) {
 				// Out of range
-				return std::numeric_limits<float>::max();
+				return floatmax;
 			}
 			glm::vec3 tolen = glm::proj(cent - m_Pos, m_Dir);
 			return glm::l2Norm(tolen) - sqrt(sq(r) - glm::dot(diff, diff));
@@ -55,12 +55,12 @@ float Ray::Hit(Geometry const* geo) const {
 		glm::vec3 pp = glm::proj(triangle->GetPos(0) - m_Pos, norm);
 		if (glm::l2Norm(pp) < eps) {
 			// Too close to the triangle
-			return std::numeric_limits<float>::max();
+			return floatmax;
 		}
 		float cosval = glm::dot(pp, m_Dir) / glm::l2Norm(pp);
 		if (cosval < eps) {
 			// Leaving or perpendicular to the plane of the triangle
-			return std::numeric_limits<float>::max();
+			return floatmax;
 		}
 		float dist = glm::l2Norm(pp) / cosval;
 		glm::vec3 pos = m_Pos + m_Dir * dist;
@@ -70,7 +70,7 @@ float Ray::Hit(Geometry const* geo) const {
 		if (triangle->OnTriangle(m_Pos + m_Dir * dist)) {
 			return dist;
 		}
-		else return std::numeric_limits<float>::max();
+		else return floatmax;
 	}
 	case GeoType::Cuboid: {
 		/*
@@ -122,18 +122,18 @@ float Ray::Hit(Geometry const* geo) const {
 		}
 
 		// Check if the ray really hit the box
-		if (diff[whichPlane] < 0.0f) return std::numeric_limits<float>().max();
+		if (diff[whichPlane] < 0.0f) return floatmax;
 		for (auto i = 0; i < 3; ++i) {
 			if (whichPlane != i) {
 				float hitpos = m_Pos[i] + diff[whichPlane] * m_Dir[i];
 				if (hitpos < cub->GetMin(i) || hitpos > cub->GetMax(i))
-					return std::numeric_limits<float>().max();
+					return floatmax;
 			}
 		}
 		return diff[whichPlane];
 	}
 	default: {
-		std::cout << "Not implemented yet!" << std::endl;
+		printf("Not implemented yet!\n");
 	}
 	}
 	return 0.0f;

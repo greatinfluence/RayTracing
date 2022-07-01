@@ -69,9 +69,9 @@ int main() {
 	YAML::Loadscene("1000ballsconfig.yaml", world, img);
 	
 	using namespace std::chrono;
-	Renderer renderer;
+	//Renderer renderer;
 	auto start = high_resolution_clock::now();
-	renderer.Render(world, img, nrays, 2500);
+	GPURenderer::Render(world, img, nrays);
 	img.Write("testpic2.png");
 	auto stop = high_resolution_clock::now();
 	std::cout << "Rendering finished. Time using: ";

@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "device_launch_parameters.h"
 #include "glm/vec3.hpp"
 
 class Image3 {

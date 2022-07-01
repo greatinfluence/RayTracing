@@ -8,11 +8,14 @@
 #include <iostream>
 //#include "Testtool.hpp"
 
-float Diffuse::scatter(glm::vec3 pos, glm::vec3 wo, glm::vec3 norm, glm::vec3& attenuation,
-    glm::vec3& wi)
-{
+__host__ __device__ float Diffuse::scatter(glm::vec3 pos, glm::vec3 wo, glm::vec3 norm,
+    glm::vec3& attenuation, glm::vec3& wi, curandState* state) {
     // Using basic importance sampling
+#ifdef __CUDA_ARCH__
+    glm::vec3 stdvec = GPURandom::RandinDisc(1.0f, *state);
+#else
     glm::vec3 stdvec = Random::RandinDisc(1.0f);
+#endif
     glm::vec3 perp = glm::perp(norm, norm + glm::vec3(1.0f, 0, 0));
     if(glm::l2Norm(perp) < eps) {
         // norm = (1.0f, 0, 0)
@@ -26,10 +29,14 @@ float Diffuse::scatter(glm::vec3 pos, glm::vec3 wo, glm::vec3 norm, glm::vec3& a
     return glm::dot(wi, norm) / pi;
 }
 
-float Metal::scatter(glm::vec3 pos, glm::vec3 wo, glm::vec3 norm, glm::vec3& attenuation, glm::vec3& wi)
-{
+__host__ __device__ float Metal::scatter(glm::vec3 pos, glm::vec3 wo, glm::vec3 norm,
+    glm::vec3& attenuation, glm::vec3& wi, curandState* state) {
     attenuation = m_Albedo;
+#ifdef __CUDA_ARCH__
+    wi = glm::reflect(-wo, norm) + GPURandom::RandinSphere(m_Fuzz, *state);
+#else
     wi = glm::reflect(-wo, norm) + Random::RandinSphere(m_Fuzz);
+#endif
     if (glm::dot(wo, norm) < eps && glm::dot(wi, norm) > -eps ||
         glm::dot(wo, norm) > -eps && glm::dot(wi, norm) < eps) {
         // Being absorbed
@@ -46,13 +53,19 @@ float Metal::scatter(glm::vec3 pos, glm::vec3 wo, glm::vec3 norm, glm::vec3& att
 	else return (h + m_Fuzz) / (2 * m_Fuzz); // Compensate for the absorbed light
 }
 
-float Dieletric::scatter(glm::vec3 pos, glm::vec3 wo, glm::vec3 norm, glm::vec3& attenuation, glm::vec3& wi)
-{
+__host__ __device__ float Dieletric::scatter(glm::vec3 pos, glm::vec3 wo, glm::vec3 norm,
+    glm::vec3& attenuation, glm::vec3& wi, curandState* state) {
     attenuation = glm::vec3(1.0f);
     float cosine = glm::dot(wo, norm);
     float sine = (float)sqrt(1.0 - cosine * cosine);
     float ref_idx = cosine > 0.0f ? (1.0f / m_Ir) : m_Ir;
-    if (ref_idx * sine > 1.0f || Random::Rand(1.0f) < reflectance(abs(cosine), ref_idx)) {
+    if (ref_idx * sine > 1.0f ||
+#ifdef __CUDA_ARCH__
+        GPURandom::Rand(1.0f, *state)
+#else
+        Random::Rand(1.0f)
+#endif
+        < reflectance(abs(cosine), ref_idx)) {
         // Reflect
         wi = glm::reflect(-wo, norm);
     }
