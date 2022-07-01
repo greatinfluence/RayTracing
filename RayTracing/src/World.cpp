@@ -7,6 +7,7 @@
 #include "Testtool.h"
 #include "Triangle.h"
 #include "Ball.h"
+#include "Geometryrepository.h"
 
 void World::AddGeo(std::shared_ptr<Geometry> geo)
 {
@@ -16,11 +17,11 @@ void World::AddGeo(std::shared_ptr<Geometry> geo)
 glm::vec3 World::RayTracing(Ray ray, int lev, glm::vec3 coef)
 {
 	float dist = std::numeric_limits<float>::max();
-	std::shared_ptr<Geometry> hitted = nullptr;
+	Geometry* hitted = nullptr;
 	if (fabs(ray.GetDir().x) > 1.5f) {
 		printf("What?\n");
 	}
-	m_Root->TestHit(ray, dist, hitted);
+	static_cast<Cuboid*>(Geometryrepository::GetGeo(m_Root))->TestHit(ray, dist, hitted);
 	if (hitted != nullptr) {
 		glm::vec3 hitpos = ray.GetPos() + ray.GetDir() * dist;
 		glm::vec3 att, wi, norm = hitted->GetNorm(hitpos);
@@ -71,6 +72,10 @@ void World::ComputeInfo(Geometry* geo, glm::vec3& cent, float& area) {
 		area = glm::l2Norm(glm::cross(tri->GetPos(1) - tri->GetPos(0), tri->GetPos(2) - tri->GetPos(0))) / 2.0f;
 		break;
 	}
+	case GeoType::Cuboid: {
+		// Do nothing
+		break;
+	}
 	default: {
 		printf("Cuboid Error: Unknown Geometry type\n");
 	}
@@ -79,40 +84,43 @@ void World::ComputeInfo(Geometry* geo, glm::vec3& cent, float& area) {
 
 constexpr int MAXOBJ = 10;
 
-std::shared_ptr<Cuboid> World::DoCreateHierarchy(std::vector<Object>::iterator beg, std::vector<Object>::iterator ed)
-{
+size_t World::DoCreateHierarchy(size_t beg, size_t ed) {
 	if (ed - beg <= MAXOBJ) {
 		// Only a few objects, just form a single node
 		auto* cub = new Cuboid();
+		std::vector<size_t> subgeos;
 		for (auto obj = beg; obj < ed; ++obj) {
-			cub->AppendSubGeo(std::shared_ptr<Geometry>(obj->geo));
+			subgeos.push_back(obj);
 		}
-		return std::shared_ptr<Cuboid>(cub);
+		cub->AppendSubGeos(*this, subgeos);
+		auto pcub = std::shared_ptr<Cuboid>(cub);
+		m_Geos.push_back(Object(pcub));
+		return m_Geos.size() - 1;
 	}
 	// Otherwise, find the best setting
 	int bestdim = 0, bestpos = 0;
 	float Fbest = std::numeric_limits<float>().max();
 	float Stot = 0;
-	for (auto j = beg; j < ed; ++j) {
-		Stot += j->area;
+	for (size_t j = beg; j < ed; ++j) {
+		Stot += m_Geos[j].area;
 	}
-	int n = (int)(ed - beg); // The number of elements in this section
+	size_t n = ed - beg; // The number of elements in this section
 	for (auto i = 0; i < 3; ++i) {
 		// enumerate each dimensions
 		// Sort the objects by dim-i
 		float Sleft = 0;
 		float Fmin = std::numeric_limits<float>().max(); // F = Sl*l+(Stot-Sl)*(n-l)
-		int bpos = 0; // record the best break pos
+		size_t bpos = 0; // record the best break pos
 
 		// Use .geo as the second parameter to make sure the sorting along the axis will always give the same outcome
-		std::sort(beg, ed, [i](Object x, Object y)
+		std::sort(m_Geos.begin() + beg, m_Geos.begin() + ed, [i](Object x, Object y)
 			{return x.cent[i] < y.cent[i] || x.cent[i] == y.cent[i] && x.geo < y.geo;});
-		for (auto j = beg; j < ed - 1; ++j) {
-			Sleft += j->area;
+		for (size_t j = beg; j < ed - 1; ++j) {
+			Sleft += m_Geos[j].area;
 			float F = Sleft * (j - beg) + (Stot - Sleft) * (ed - j);
 			if(F < Fmin) {
 				Fmin = F;
-				bpos = (int)(j - beg) + 1;
+				bpos = j - beg + 1;
 			}
 		}
 		if (Fmin < Fbest) {
@@ -121,22 +129,24 @@ std::shared_ptr<Cuboid> World::DoCreateHierarchy(std::vector<Object>::iterator b
 			bestdim = i;
 		}
 	}
-	std::sort(beg, ed, [bestdim](Object x, Object y)
+	std::sort(m_Geos.begin() + beg, m_Geos.begin() + ed, [bestdim](Object x, Object y)
 		{return x.cent[bestdim] < y.cent[bestdim] || x.cent[bestdim] == y.cent[bestdim] && x.geo < y.geo;});
 	auto* cub = new Cuboid();
 	auto cl = DoCreateHierarchy(beg, beg + bestpos);
 	auto cr = DoCreateHierarchy(beg + bestpos, ed);
-	cub->AppendSubGeo(cl);
-	cub->AppendSubGeo(cr);
-	return std::shared_ptr<Cuboid>(cub);
+	std::vector<size_t> subgeos{ cl, cr };
+	cub->AppendSubGeos(*this, subgeos);
+	auto pcub = std::shared_ptr<Cuboid>(cub);
+	m_Geos.push_back(Object(pcub));
+	return m_Geos.size() - 1;
 }
 
 
 
 void World::CreateHierarchy() {
-	if (m_Root != nullptr) {
+	if (m_Root != 0) {
 		// The hierarchy has already been built
 		return;
 	}
-	m_Root = DoCreateHierarchy(m_Geos.begin(), m_Geos.end());
+	m_Root = DoCreateHierarchy(0, m_Geos.size());
 }

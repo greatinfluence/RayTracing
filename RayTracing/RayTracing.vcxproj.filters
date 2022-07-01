@@ -1104,6 +1104,12 @@
     <ClInclude Include="src\Fileoperator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Geometryrepository.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Cuboidgpu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\vendor\glm\detail\func_common.inl">
@@ -1524,6 +1530,7 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="src\twoballsconfig.yaml" />
+    <None Include="1000ballsconfig.yaml" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\vendor\glm\detail\glm.cpp">
@@ -1669,5 +1676,6 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="src\Materialrepository.cu" />
+    <CudaCompile Include="src\Geometryrepository.cu" />
   </ItemGroup>
 </Project>

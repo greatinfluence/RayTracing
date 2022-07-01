@@ -5,8 +5,8 @@
 
 class World {
 public:
-	World(): m_Cam(), m_Background(glm::vec3(0)) {}
-	World(Camera cam, glm::vec3 back = glm::vec3(0.0f)): m_Cam(cam), m_Background(back) {}
+	World() : m_Cam(), m_Background(glm::vec3(0)), m_Root{0} {}
+	World(Camera cam, glm::vec3 back = glm::vec3(0.0f)) : m_Cam(cam), m_Background(back), m_Root{0} {}
 
 	// AddGeo(geo) adds the geometry into the world
 	void AddGeo(std::shared_ptr<Geometry> geo);
@@ -35,9 +35,9 @@ private:
 		}
 	};
 	static void ComputeInfo(Geometry* geo, glm::vec3& cent, float& area);
-	std::shared_ptr<Cuboid> DoCreateHierarchy(std::vector<Object>::iterator beg, std::vector<Object>::iterator ed);
+	size_t DoCreateHierarchy(size_t beg, size_t ed);
 	std::vector<Object> m_Geos;
-	std::shared_ptr<Cuboid> m_Root;
+	size_t m_Root;
 	Camera m_Cam;
 	glm::vec3 m_Background;
 };

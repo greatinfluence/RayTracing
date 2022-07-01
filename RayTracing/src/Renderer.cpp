@@ -3,8 +3,12 @@
 #include <iostream>
 #include <thread>
 
+#include "Geometryrepository.h"
+
 void Renderer::Render(World& world, Image3& output, int nrays, int OutputFreq) {
 	world.CreateHierarchy();
+	Geometryrepository::Initiate(world);
+	
 	std::vector<std::thread> threads;
 	std::mutex OutputLock;
 

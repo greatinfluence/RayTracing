@@ -151,9 +151,11 @@
     <ClInclude Include="src\Ball.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Cuboid.h" />
+    <ClInclude Include="src\Cuboidgpu.h" />
     <ClInclude Include="src\Fileoperator.h" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Materialrepository.h" />
+    <ClInclude Include="src\Geometryrepository.h" />
     <ClInclude Include="src\Random.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\Settings.h" />
@@ -513,9 +515,11 @@
     <ClInclude Include="src\Yamlext.h" />
   </ItemGroup>
   <ItemGroup>
+    <CudaCompile Include="src\Geometryrepository.cu" />
     <CudaCompile Include="src\Materialrepository.cu">
       <FileType>Document</FileType>
     </CudaCompile>
+    <None Include="1000ballsconfig.yaml" />
     <None Include="src\twoballsconfig.yaml" />
     <None Include="src\vendor\glm\detail\func_common.inl" />
     <None Include="src\vendor\glm\detail\func_common_simd.inl" />

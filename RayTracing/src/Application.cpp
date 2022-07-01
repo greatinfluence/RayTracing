@@ -8,7 +8,7 @@
 #include "Random.h"
 
 int main() {
-	int nrays = 512;
+	int nrays = 8;
 	/*
 	Image3 img(512, 256);
 	World world(Camera(glm::vec3(0), glm::vec3(1, 0, 0), glm::vec3(0, 1, 0)), glm::vec3(1.0f));

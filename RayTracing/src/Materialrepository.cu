@@ -18,23 +18,25 @@ uint32_t Materialrepository::AddMat(std::shared_ptr<Material> mat) {
 	return (uint32_t)m_Mats.size() - 1;
 }
 
-void Materialrepository::CleanMemory(size_t size) {
+void Materialrepository::CleanMemory() {
+	size_t size = m_Mats.size();
 	if (g_Mats_cpu != nullptr) {
-		for (auto i = 0; i < size; ++i) {
+		for (size_t i = 0; i < size; ++i) {
 			cudaFree(g_Mats_cpu[i]);
 			cudaFree(g_Mats_cpu);
 		}
 	}
 }
 
-void Materialrepository::Sendtogpu(Material** source, size_t size) {
+void Materialrepository::Sendtogpu() {
 	if (g_Mats_cpu != nullptr) {
 		printf("Sendtogpu Error: The material has already sent to GPU!\n");
 	}
+	size_t size = m_Mats.size();
 	cudaMallocManaged(&g_Mats_cpu, sizeof(Material*) * size);
 	for (auto i = 0; i < size; ++i) {
-		cudaMalloc(&(g_Mats_cpu[i]), sizeof(*source[i]));
-		cudaMemcpy(g_Mats_cpu[i], m_Mats[i].get(), sizeof(*source[i]),
+		cudaMalloc(&(g_Mats_cpu[i]), sizeof(*m_Mats[i]));
+		cudaMemcpy(g_Mats_cpu[i], m_Mats[i].get(), sizeof(*m_Mats[i]),
 			cudaMemcpyKind::cudaMemcpyHostToDevice);
 	}
 	cudaMemcpy(&g_Mats, &g_Mats_cpu, sizeof(Material**), cudaMemcpyKind::cudaMemcpyHostToDevice);
@@ -44,7 +46,6 @@ __host__ __device__ Material* Materialrepository::GetMat(uint32_t matid) {
 #ifdef __CUDA_ARCH__
 	// Device
 	return g_Mats[matid];
-
 #else
 	// Host
 	return m_Mats[matid].get();

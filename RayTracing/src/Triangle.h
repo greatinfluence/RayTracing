@@ -10,14 +10,14 @@ public:
 	~Triangle() = default;
 
 	// GetPos(ind) returns the position of the ind-th vertex of the triangle
-	glm::vec3 GetPos(size_t ind) const;
+	__host__ __device__ glm::vec3 GetPos(size_t ind) const;
 
-	GeoType GetType() const override { return GeoType::Triangle; }
-	glm::vec3 GetNorm(glm::vec3 pos) const override { return m_Norm; }
+	__host__ __device__ GeoType GetType() const override { return GeoType::Triangle; }
+	__host__ __device__ glm::vec3 GetNorm(glm::vec3 pos) const override { return m_Norm; }
 
 	// OnTriangle(pos) tests if pos is in the triangle
 	//   pos should be in the plane of the triangle
-	bool OnTriangle(glm::vec3 pos) const;
+	__host__ __device__ bool OnTriangle(glm::vec3 pos) const;
 private:
 	glm::vec3 m_Vertices[3];
 	glm::vec3 m_Norm;
