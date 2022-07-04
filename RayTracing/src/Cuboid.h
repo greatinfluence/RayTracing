@@ -7,7 +7,7 @@ class World;
 
 class Cuboid: public Geometry {
 public:
-	Cuboid();
+	__host__ __device__ Cuboid();
 	~Cuboid() = default;
 
 	// AppendSubGeos(subgeos) appends all subgeos as sub-geometry into the cuboid
@@ -21,11 +21,21 @@ public:
 	// GetMax(dim) returns the maximum bound of the dimension dim
 	__host__ __device__ float GetMax(int dim) const { return m_Max[dim]; }
 
+	__host__ __device__ void SetMin(int dim, float val) { m_Min[dim] = val; }
+	__host__ __device__ void SetMax(int dim, float val) { m_Max[dim] = val; }
+
 	/*
 		TestHit(ray, dist, hitted) does the ray-hit detection among all the sub-geometries
 			returns the closest distance and the corresponding sub-geometry
 	*/
 	__host__ __device__ void TestHit(Ray const& ray, float& dist, Geometry*& hitted) const;
+	
+	size_t GetSize() const override { return sizeof(Cuboid); };
+
+	__host__ __device__ size_t* GetSubgeoids() const { return m_Subgeoid; }
+	__host__ __device__ size_t GetNsubgeo() const { return m_Nsubgeo; }
+	__host__ __device__ void SetSubgeoid(size_t* subgeoid) { m_Subgeoid = subgeoid; }
+	__host__ __device__ void SetNsubgeo(size_t nsubgeo) { m_Nsubgeo = nsubgeo; }
 private:
 	float m_Min[3], m_Max[3];
 	size_t m_Nsubgeo;

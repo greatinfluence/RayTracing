@@ -23,6 +23,8 @@ public:
 	std::shared_ptr<Geometry> const GetGeo(size_t ind) const { return m_Geos[ind].geo; }
 	// Function to create the hierarchy of the geometries
 	void CreateHierarchy();
+
+	size_t GetRoot() const { return m_Root; }
 private:
 	struct Object{
 		std::shared_ptr<Geometry> geo;

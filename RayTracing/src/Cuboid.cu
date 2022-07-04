@@ -12,13 +12,9 @@
 #include "glm/gtx/norm.hpp"
 #include "World.h"
 
-Cuboid::Cuboid()
-	: m_Min{ std::numeric_limits<float>::max(), 
-             std::numeric_limits<float>::max(), 
-			 std::numeric_limits<float>::max() },
-	m_Max{ std::numeric_limits<float>::min(),
-		   std::numeric_limits<float>::min(),
-		   std::numeric_limits<float>::min() }, m_Nsubgeo{ 0 }, m_Subgeoid{nullptr} {}
+__host__ __device__ Cuboid::Cuboid()
+	: m_Min{ floatmax, floatmax, floatmax }, m_Max{ floatmin, floatmin, floatmin },
+	m_Nsubgeo{ 0 }, m_Subgeoid{nullptr} {}
 
 void Cuboid::AppendSubGeos(World const& world, std::vector<size_t> const& subgeos) {
 	m_Subgeoid = new size_t[subgeos.size()];
@@ -71,8 +67,17 @@ __host__ __device__ glm::vec3 Cuboid::GetNorm(glm::vec3 pos) const
 
 __host__ __device__ void Cuboid::TestHit(Ray const& ray, float& dist, Geometry*& hitted) const
 {
+	printf("The memory address of the Cuboid: %p\n", this);
+	printf("The type of Cuboid: %d\n", (int)GeoType::Cuboid);
+	printf("The type of this Cuboid: %d\n", (int)GetType());
+	printf("The type of this Cuboid: %d\n", (int)this->GetType());
+	printf("Cuboid: Receives the ray: (%f, %f, %f) -> (%f, %f, %f)\n", ray.GetPos().x, ray.GetPos().y, ray.GetPos().z, ray.GetDir().x, ray.GetDir().y, ray.GetDir().z);
+	if (ray.Hit(nullptr) != -1) {
+		printf("Bad hit test\n");
+	}
 	if (ray.Hit(this) < dist) {
 		// It is possible for the ray to hit the box
+		printf("Cuboid: Has hit the ray\n");
 		for(size_t i = 0; i < m_Nsubgeo; ++ i) {
 			auto geo = Geometryrepository::GetGeo(m_Subgeoid[i]);
 			if (geo->GetType() == GeoType::Cuboid) {
@@ -89,5 +94,7 @@ __host__ __device__ void Cuboid::TestHit(Ray const& ray, float& dist, Geometry*&
 				}
 			}
 		}
+		printf("Cuboid: End hit refreshing\n");
 	}
+	printf("Cuboid: End ray testing\n");
 }

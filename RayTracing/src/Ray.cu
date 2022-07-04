@@ -8,14 +8,16 @@
 
 #include "Settings.h"
 
-Ray::Ray(glm::vec3 pos, glm::vec3 dir)
-	: m_Pos(pos), m_Dir(glm::normalize(dir)) {}
+__host__ __device__ Ray::Ray(glm::vec3 pos, glm::vec3 dir)
+	: m_Pos{ pos }, m_Dir{ glm::normalize(dir) } {}
 
 __host__ __device__ float Ray::Hit(Geometry const* geo) const {
 	if (geo == nullptr) {
 		printf("Ray::Hit error: Received nullptr\n");
 		return -1;
 	}
+	printf("Enter Ray::Hit\n");
+	printf("0x%p\n", geo);
 	switch (geo->GetType()) {
 	case GeoType::Ball: {
 		auto* ball = static_cast<Ball const*> (geo);
@@ -73,6 +75,7 @@ __host__ __device__ float Ray::Hit(Geometry const* geo) const {
 		else return floatmax;
 	}
 	case GeoType::Cuboid: {
+		printf("In Cuboid\n");
 		/*
 			This method is modified from http://tog.acm.org/resources/GraphicsGems/gems/RayBox.c
 		*/
@@ -105,6 +108,7 @@ __host__ __device__ float Ray::Hit(Geometry const* geo) const {
 
 		if (inside) {
 			// Ray is inside the box
+			printf("Inside the box\n");
 			return 0.0f;
 		}
 
@@ -121,6 +125,8 @@ __host__ __device__ float Ray::Hit(Geometry const* geo) const {
 			if (diff[whichPlane] < diff[i]) whichPlane = i;
 		}
 
+		printf("Last check\n");
+
 		// Check if the ray really hit the box
 		if (diff[whichPlane] < 0.0f) return floatmax;
 		for (auto i = 0; i < 3; ++i) {
@@ -130,6 +136,7 @@ __host__ __device__ float Ray::Hit(Geometry const* geo) const {
 					return floatmax;
 			}
 		}
+		printf("Touches the Cuboid\n");
 		return diff[whichPlane];
 	}
 	default: {

@@ -4,7 +4,7 @@
 #include "glm/gtx/norm.hpp"
 #include "glm/gtx/projection.hpp"
 
-Triangle::Triangle(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, glm::vec3 norm)
+__host__ __device__ Triangle::Triangle(glm::vec3 v1, glm::vec3 v2, glm::vec3 v3, glm::vec3 norm)
 	:m_Vertices{v1, v2, v3}, m_Norm(norm) {
 	if (glm::l2Norm(norm) < 1e-8) {
 		m_Norm = ComputeTriangNorm(v1, v2, v3);

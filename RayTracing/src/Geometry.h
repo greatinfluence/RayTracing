@@ -14,7 +14,7 @@ enum class GeoType {
 
 class Geometry {
 public:
-	Geometry() : m_Matid(0u) {}
+	__host__ __device__ Geometry() : m_Matid{ 0u } {}
 	virtual ~Geometry() = default;
 
 	// GetType() returns the type of the geometry
@@ -25,10 +25,12 @@ public:
 
 	__host__ __device__ Material* GetMaterial() const { return Materialrepository::GetMat(m_Matid); }
 
-	uint32_t GetMatid() const { return m_Matid; }
+	__host__ __device__ uint32_t GetMatid() const { return m_Matid; }
+
+	virtual size_t GetSize() const = 0;
 
 	// AddMaterial(mat) adds the material to the geometry
-	void AddMaterial(uint32_t matid) {
+	__host__ __device__ void AddMaterial(uint32_t matid) {
 		m_Matid = matid;
 	}
 protected:

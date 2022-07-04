@@ -72,6 +72,7 @@ int main() {
 	//Renderer renderer;
 	auto start = high_resolution_clock::now();
 	GPURenderer::Render(world, img, nrays);
+	return 0;
 	img.Write("testpic2.png");
 	auto stop = high_resolution_clock::now();
 	std::cout << "Rendering finished. Time using: ";

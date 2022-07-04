@@ -12,7 +12,7 @@ enum class MatType {
 
 class Material {
 public:
-	Material(glm::vec3 glow): m_Glow(glow) {}
+	__host__ __device__ Material(glm::vec3 glow): m_Glow(glow) {}
 
 	// scatter(pos, wo, norm, attenuation, wi, state) will compute the scattered ray's direction
 	//     and it's strength attenuation, save them into wi and attenuation.
@@ -31,7 +31,7 @@ class Diffuse : public Material {
 public:
 	Diffuse(): Material(glm::vec3(0.0f)), m_Albedo(glm::vec3(1.0f)) {}
 	Diffuse(glm::vec3 albedo) : Material(glm::vec3(0.0f)), m_Albedo(albedo) {}
-	Diffuse(glm::vec3 gloom, glm::vec3 albedo)
+	__host__ __device__ Diffuse(glm::vec3 gloom, glm::vec3 albedo)
 		: Material(gloom), m_Albedo(albedo) {}
 	__host__ __device__ float scatter(glm::vec3 pos, glm::vec3 wo, glm::vec3 norm,
 		glm::vec3& attenuation, glm::vec3& wi, curandState* state = nullptr) override;
@@ -48,7 +48,8 @@ public:
 	Metal(): Material(glm::vec3(0.0f)), m_Albedo(glm::vec3(1.0f)), m_Fuzz(0.0f) {}
 	Metal(glm::vec3 albedo): Material(glm::vec3(0.0f)), m_Albedo(albedo), m_Fuzz(0.0f) {}
 	Metal(glm::vec3 albedo, float fuzz): Material(glm::vec3(0.0f)), m_Albedo(albedo), m_Fuzz(fuzz) {}
-	Metal(glm::vec3 gloom, glm::vec3 albedo, float fuzz): Material(gloom), m_Albedo(albedo), m_Fuzz(fuzz) {}
+	__host__ __device__ Metal(glm::vec3 gloom, glm::vec3 albedo, float fuzz)
+		: Material(gloom), m_Albedo(albedo), m_Fuzz(fuzz) {}
 	__host__ __device__ float scatter(glm::vec3 pos, glm::vec3 wo, glm::vec3 norm,
 		glm::vec3& attenuation, glm::vec3& wi, curandState* state = nullptr) override;
 	void SetAlbedo(glm::vec3 albedo) { m_Albedo = albedo; }
@@ -65,7 +66,7 @@ class Dieletric : public Material {
 public:
 	Dieletric() : Material(glm::vec3(0.0f)), m_Ir(1.0f) {}
 	Dieletric(float ir) : Material(glm::vec3(0.0f)), m_Ir(ir) {}
-	Dieletric(glm::vec3 gloom, float ir) : Material(gloom), m_Ir(ir) {}
+	__host__ __device__ Dieletric(glm::vec3 gloom, float ir) : Material(gloom), m_Ir(ir) {}
 	__host__ __device__ float scatter(glm::vec3 pos, glm::vec3 wo, glm::vec3 norm,
 		glm::vec3& attenuation, glm::vec3& wi, curandState* state = nullptr) override;
 	void SetIr(float ir) { m_Ir = ir; }

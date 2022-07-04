@@ -1107,9 +1107,6 @@
     <ClInclude Include="src\Geometryrepository.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Cuboidgpu.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Raytracer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1534,6 +1531,7 @@
     </None>
     <None Include="src\twoballsconfig.yaml" />
     <None Include="1000ballsconfig.yaml" />
+    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\vendor\glm\detail\glm.cpp">
@@ -1545,13 +1543,7 @@
     <ClCompile Include="src\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\World.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Testtool.cpp">
@@ -1682,6 +1674,12 @@
       <Filter>Source Files</Filter>
     </CudaCompile>
     <CudaCompile Include="src\Triangle.cu">
+      <Filter>Source Files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="src\Camera.cu">
+      <Filter>Source Files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="src\Material.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
   </ItemGroup>

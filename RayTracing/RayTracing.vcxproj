@@ -103,7 +103,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLM_FORCE_CUDA;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)RayTracing\src\vendor;$(SolutionDir)RayTracing\src\vendor\yaml-cpp\include; $(CUDA_PATH)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -128,7 +128,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLM_FORCE_CUDA;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)RayTracing\src\vendor;$(SolutionDir)RayTracing\src\vendor\yaml-cpp\include; $(CUDA_PATH)\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -153,7 +153,6 @@
     <ClInclude Include="src\Ball.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Cuboid.h" />
-    <ClInclude Include="src\Cuboidgpu.h" />
     <ClInclude Include="src\Fileoperator.h" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Materialrepository.h" />
@@ -524,6 +523,7 @@
     </CudaCompile>
     <CudaCompile Include="src\Random.cpp" />
     <None Include="1000ballsconfig.yaml" />
+    <None Include="cpp.hint" />
     <None Include="src\twoballsconfig.yaml" />
     <None Include="src\vendor\glm\detail\func_common.inl" />
     <None Include="src\vendor\glm\detail\func_common_simd.inl" />
@@ -667,12 +667,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
-    <ClCompile Include="src\Camera.cpp" />
+    <CudaCompile Include="src\Camera.cu">
+      <FileType>Document</FileType>
+    </CudaCompile>
     <CudaCompile Include="src\Cuboid.cu" />
     <CudaCompile Include="src\Image.cpp">
       <FileType>Document</FileType>
     </CudaCompile>
-    <ClCompile Include="src\Material.cpp" />
+    <CudaCompile Include="src\Material.cu">
+      <FileType>Document</FileType>
+    </CudaCompile>
     <CudaCompile Include="src\Ray.cu">
       <FileType>Document</FileType>
     </CudaCompile>
