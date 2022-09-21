@@ -240,6 +240,7 @@
     <CudaCompile Include="src\Random.cpp" />
     <None Include="1000ballsconfig.yaml" />
     <None Include="cpp.hint" />
+    <None Include="redballconfig.yaml" />
     <None Include="src\twoballsconfig.yaml" />
   </ItemGroup>
   <ItemGroup>
