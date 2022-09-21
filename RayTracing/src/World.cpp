@@ -29,10 +29,10 @@ __host__ __device__ la::vec3 World::RayTracing(Ray const& ray, int lev, la::vec3
 		float poss = mat->scatter(hitpos, -ray.m_Dir,
 			norm, att, wi);
 		//std::cout << coef * att * la::dot(wi, norm) / poss << std::endl;
-		if (fabs(dist) > 1e3 || fabs(ray.m_Dir.x) > 1.5f) {
+	//	if (fabs(dist) > 1e3 || fabs(ray.m_Dir.x) > 1.5f) {
 			// Impossible!
-			printf("What?\n");
-		}
+		//	printf("What?\n");
+		//}
 		/*if (hitted->GetType() == GeoType::Ball && lev == 1) {
 			std::cout << "Ray Dir: " << ray.m_Dir;
 			std::cout << "Norm: " << norm;
@@ -49,8 +49,6 @@ __host__ __device__ la::vec3 World::RayTracing(Ray const& ray, int lev, la::vec3
 			float rr = la::clamp(fmax(coef.x, fmax(coef.y, coef.z)), 0.0f, 0.95f);
 			if (lev > 30 || Random::Rand(1.0f) > rr) return coef * mat->GetGlow();	
 			coef = coef / rr;
-		//	return coef / rr * mat->GetGlow() +
-		//		RayTracing(Ray(hitpos + wi * 1e-4f, wi), lev + 1, coef * att * fabs(la::dot(wi, norm)) / poss) / rr;
 		}
 		return coef * mat->GetGlow() +
 			RayTracing(Ray(hitpos + wi * 1e-4f, wi), lev + 1, coef * att * fabs(la::dot(wi, norm)) / poss);

@@ -8,7 +8,7 @@
 #include "Random.h"
 
 int main() {
-	int nrays = 1024;
+	int nrays = 8;
 	/*
 	Image3 img(512, 256);
 	World world(Camera(la::vec3(0), la::vec3(1, 0, 0), la::vec3(0, 1, 0)), la::vec3(1.0f));
@@ -76,7 +76,8 @@ int main() {
 	using namespace std::chrono;
 	//Renderer renderer;
 	auto start = high_resolution_clock::now();
-	GPURenderer::Render(world, img, nrays);
+	Renderer renderer;
+	renderer.Render(world, img, nrays);
 	img.Write("testpic2.png");
 	auto stop = high_resolution_clock::now();
 	std::cout << "Rendering finished. Time using: ";

@@ -15393,7 +15393,7 @@ World:
         - 1
         - 0
 Image:
-  Width: 1024
-  Height: 512
+  Width: 2048
+  Height: 1024
   Channels: 3
   Filepath: ""

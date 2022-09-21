@@ -160,6 +160,128 @@ __device__ inline static float Hitdevice(Ray const& ray, Geometry const* geo) {
 	return 0.0f;
 }
 
+float Hithost(Ray const& ray, Geometry const* geo) {
+	auto const& m_Pos = ray.m_Pos;
+	auto const& m_Dir = ray.m_Dir;
+	switch (geo->GetType()) {
+	case GeoType::Ball: {
+		auto* ball = static_cast<Ball const*> (geo);
+		float r = ball->m_Radius;
+		la::vec3 cent = ball->m_Center;
+		float d = la::l2Norm(cent - m_Pos);
+		if (d < r) {
+			// Inside the ball
+			if (d < eps) {
+				// At the center
+				return r;
+			}
+			float cosine = la::dot(la::normalize(cent - m_Pos), m_Dir);
+			return (float)(d * cosine + sqrt(sq(d * cosine) + sq(r) - sq(d)));
+		}
+		else {
+			// Outside the ball
+			if (la::dot(cent - m_Pos, m_Dir) < 0) {
+				// leaving the ball
+				return std::numeric_limits<float>::max();
+			}
+			la::vec3 diff = la::perp(cent - m_Pos, m_Dir);
+			if (la::l2Norm(diff) > r) {
+				// Out of range
+				return std::numeric_limits<float>::max();
+			}
+			la::vec3 tolen = la::proj(cent - m_Pos, m_Dir);
+			return la::l2Norm(tolen) - sqrt(sq(r) - la::dot(diff, diff));
+		}
+	}
+	case GeoType::Triangle: {
+		auto* triangle = static_cast<Triangle const*>(geo);
+		la::vec3 norm = triangle->GetNorm(m_Pos);
+		la::vec3 pp = la::proj(triangle->GetPos(0) - m_Pos, norm);
+		if (la::l2Norm(pp) < eps) {
+			// Too close to the triangle
+			return std::numeric_limits<float>::max();
+		}
+		float cosval = la::dot(pp, m_Dir) / la::l2Norm(pp);
+		if (cosval < eps) {
+			// Leaving or perpendicular to the plane of the triangle
+			return std::numeric_limits<float>::max();
+		}
+		float dist = la::l2Norm(pp) / cosval;
+		la::vec3 pos = m_Pos + m_Dir * dist;
+		la::vec3 vec = pos - triangle->GetPos(0);
+		float val = la::l2Norm(la::proj(vec, norm));
+		if (triangle->OnTriangle(m_Pos + m_Dir * dist)) {
+			return dist;
+		}
+		else return std::numeric_limits<float>::max();
+	}
+	case GeoType::Cuboid: {
+		/*
+			This method is modified from http://tog.acm.org/resources/GraphicsGems/gems/RayBox.c
+		*/
+		auto* cub = static_cast<Cuboid const*>(geo);
+		bool inside = true; // Denote if the ray is inside the box
+
+		// quadrant denote if the starting position is inside the box
+		enum class Quadrant {
+			Left = 0,
+			Middle = 1,
+			Right = 2,
+		} quadrant[3] = { Quadrant::Middle, Quadrant::Middle, Quadrant::Middle };
+		float candidatePlane[3] = {};
+		int whichPlane = 0;
+		float diff[3] = {};
+
+		for (auto i = 0; i < 3; ++i) {
+			float min = cub->GetMin(i), max = cub->GetMax(i);
+			if (m_Pos[i] < min) {
+				quadrant[i] = Quadrant::Left;
+				candidatePlane[i] = min;
+				inside = false;
+			}
+			else if (m_Pos[i] > max) {
+				quadrant[i] = Quadrant::Right;
+				candidatePlane[i] = max;
+				inside = false;
+			}
+		}
+
+		if (inside) {
+			// Ray is inside the box
+			return 0.0f;
+		}
+
+		// Calculate the dist to the plane
+		for (auto i = 0; i < 3; ++i) {
+			if (quadrant[i] != Quadrant::Middle && fabs(m_Dir[i]) > 1e-6) {
+				diff[i] = (candidatePlane[i] - m_Pos[i]) / m_Dir[i];
+			}
+			else diff[i] = -1.0f;
+		}
+
+		// Get largest of the dist for final choice of intersection
+		for (auto i = 0; i < 3; ++i) {
+			if (diff[whichPlane] < diff[i]) whichPlane = i;
+		}
+
+		// Check if the ray really hit the box
+		if (diff[whichPlane] < 0.0f) return std::numeric_limits<float>().max();
+		for (auto i = 0; i < 3; ++i) {
+			if (whichPlane != i) {
+				float hitpos = m_Pos[i] + diff[whichPlane] * m_Dir[i];
+				if (hitpos < cub->GetMin(i) || hitpos > cub->GetMax(i))
+					return std::numeric_limits<float>().max();
+			}
+		}
+		return diff[whichPlane];
+	}
+	default: {
+		printf("Not implemented yet!\n");
+	}
+}
+	return 0.0f;
+}
+
 __host__ __device__ float Ray::Hit(Geometry const* geo) const
 {
 #ifdef __CUDA_ARCH__
@@ -168,6 +290,6 @@ __host__ __device__ float Ray::Hit(Geometry const* geo) const
 	return Hitdevice(*this, geo);
 #else
 	// host
-	return 0.0f;
+	return Hithost(*this, geo);
 #endif
 }
