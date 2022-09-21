@@ -4,6 +4,11 @@
 #include <string>
 #include <chrono>
 
+#include "cuda_runtime.h"
+
+#define checkCudaErrors(val) check_cuda( (val), #val, __FILE__, __LINE__ )
+
+void check_cuda(cudaError_t result, char const* const func, const char* const file, int const line);
 
 // pi
 constexpr float pi = 3.14159265358979f;
@@ -18,7 +23,7 @@ constexpr float floatmax = std::numeric_limits<float>().max();
 constexpr float floatmin = std::numeric_limits<float>().min();
 
 // sq(x) returns x * x
-float sq(float x);
+__host__ __device__ inline float sq(float x) { return x * x; }
 
 /*
     formatDuration(d) formats the time duration into the form xx:xx:xx

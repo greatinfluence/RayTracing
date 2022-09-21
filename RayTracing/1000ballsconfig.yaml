@@ -8350,9 +8350,9 @@ World:
     Hor: 1.57000005
     Perp: 1.57000005
   Background:
-    - 1
-    - 1
-    - 1
+    - 0.8
+    - 0.6
+    - 0.4
   Geos:
     - Type: 2
       Material: 0
@@ -15393,7 +15393,7 @@ World:
         - 1
         - 0
 Image:
-  Width: 512
-  Height: 256
+  Width: 2048
+  Height: 1024
   Channels: 3
   Filepath: ""

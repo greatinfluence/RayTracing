@@ -1,7 +1,7 @@
 #pragma once
 
 #include "yaml-cpp/yaml.h"
-#include "glm/vec3.hpp"
+#include "la.h"
 #include "Camera.h"
 #include "Material.h"
 #include "Triangle.h"
@@ -11,8 +11,8 @@
 
 namespace YAML {
 	template<>
-	struct convert<glm::vec3> {
-		static Node encode(glm::vec3 const& rhs) {
+	struct convert<la::vec3> {
+		static Node encode(la::vec3 const& rhs) {
 			Node node;
 			node.push_back(rhs.x);
 			node.push_back(rhs.y);
@@ -20,7 +20,7 @@ namespace YAML {
 			return node;
 		}
 
-		static bool decode(Node const& node, glm::vec3& rhs) {
+		static bool decode(Node const& node, la::vec3& rhs) {
 			if (!node.IsSequence() || node.size() != 3) {
 				return false;
 			}
@@ -47,7 +47,7 @@ namespace YAML {
 			if (!node.IsMap() || node.size() != 5) {
 				return false;
 			}
-			rhs = Camera(node["Pos"].as<glm::vec3>(), node["Front"].as<glm::vec3>(), node["Up"].as<glm::vec3>(),
+			rhs = Camera(node["Pos"].as<la::vec3>(), node["Front"].as<la::vec3>(), node["Up"].as<la::vec3>(),
 				node["Hor"].as<float>(), node["Perp"].as<float>());
 			return true;
 		}
@@ -103,15 +103,15 @@ namespace YAML {
 			if (!node["Type"]) return false;
 			switch (node["Type"].as<MatType>()) {
 			case MatType::Diffuse: {
-				rhs = std::shared_ptr<Material>(new Diffuse(node["Glow"].as<glm::vec3>(), node["Albedo"].as<glm::vec3>()));
+				rhs = std::shared_ptr<Material>(new Diffuse(node["Glow"].as<la::vec3>(), node["Albedo"].as<la::vec3>()));
 				return true;
 			}
 			case MatType::Metal: {
-				rhs = std::shared_ptr<Material>(new Metal(node["Glow"].as<glm::vec3>(), node["Albedo"].as<glm::vec3>(), node["Fuzz"].as<float>()));
+				rhs = std::shared_ptr<Material>(new Metal(node["Glow"].as<la::vec3>(), node["Albedo"].as<la::vec3>(), node["Fuzz"].as<float>()));
 				return true;
 			}
 			case MatType::Dieletric: {
-				rhs = std::shared_ptr<Material>(new Dieletric(node["Glow"].as<glm::vec3>(), node["Ir"].as<float>()));
+				rhs = std::shared_ptr<Material>(new Dieletric(node["Glow"].as<la::vec3>(), node["Ir"].as<float>()));
 				return true;
 			}
 			default:
@@ -145,15 +145,15 @@ namespace YAML {
 			switch (geo->GetType()) {
 			case GeoType::Ball: {
 				auto ball = static_cast<Ball*>(geo.get());
-				node["Center"] = ball->GetCenter();
-				node["Radius"] = ball->GetRadius();
+				node["Center"] = ball->m_Center;
+				node["Radius"] = ball->m_Radius;
 				break;
 			}
 			case GeoType::Triangle: {
 				auto tri = static_cast<Triangle*>(geo.get());
 				for(size_t i = 0; i < 3; ++ i)
 					node["Vertices"][i] = tri->GetPos(i);
-				node["Norm"] = tri->GetNorm(glm::vec3(0));
+				node["Norm"] = tri->GetNorm(la::vec3(0));
 				break;
 			}
 			default: {
@@ -171,14 +171,14 @@ namespace YAML {
 			}
 			switch (node["Type"].as<GeoType>()) {
 			case GeoType::Ball: {
-				rhs = std::shared_ptr<Geometry>(new Ball(node["Center"].as<glm::vec3>(), node["Radius"].as<float>()));
+				rhs = std::shared_ptr<Geometry>(new Ball(node["Center"].as<la::vec3>(), node["Radius"].as<float>()));
 				break;
 			}
 			case GeoType::Triangle: {
 				rhs = std::shared_ptr<Geometry>(new Triangle(
-					node["Vertices"][0].as<glm::vec3>(),
-					node["Vertices"][1].as<glm::vec3>(),
-					node["Vertices"][2].as<glm::vec3>(), node["Norm"].as<glm::vec3>()));
+					node["Vertices"][0].as<la::vec3>(),
+					node["Vertices"][1].as<la::vec3>(),
+					node["Vertices"][2].as<la::vec3>(), node["Norm"].as<la::vec3>()));
 				break;
 			}
 			default: {
@@ -217,7 +217,7 @@ namespace YAML {
 				return false;
 			}
 			if (!node["Camera"] || !node["Background"] || !node["Geos"]) return false;
-			wd = World(node["Camera"].as<Camera>(), node["Background"].as<glm::vec3>());
+			wd = World(node["Camera"].as<Camera>(), node["Background"].as<la::vec3>());
 			auto geos = node["Geos"];
 			for (auto it = geos.begin(); it != geos.end(); ++it) {
 				wd.AddGeo(it->as<std::shared_ptr<Geometry>>());

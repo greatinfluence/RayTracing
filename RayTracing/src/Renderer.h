@@ -2,8 +2,13 @@
 
 #include "World.h"
 #include "Image.h"
+#include "Random.h"
 
 #include <mutex>
+
+namespace GPURenderer {
+	void Render(World& world, Image3& output, int nrays = 32);
+}
 
 class Renderer {
 public:
@@ -13,5 +18,5 @@ public:
 	//     OutputFreq rays
 	void Render(World& world, Image3& output, int nrays = 32, int OutputFreq = 1000);
 private:
-	static void DoRender(World& world, Image3& output, uint32_t from, uint32_t to, int narays, int OutputFreq, int nthread, std::mutex& lock);
+	static void DoRender(World& world, Image3& output, uint32_t from, uint32_t to, int nrays, int OutputFreq, int nthread, std::mutex& lock);
 };

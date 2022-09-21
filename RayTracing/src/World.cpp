@@ -14,62 +14,60 @@ void World::AddGeo(std::shared_ptr<Geometry> geo)
 	m_Geos.push_back(geo);
 }
 
-glm::vec3 World::RayTracing(Ray ray, int lev, glm::vec3 coef)
+__host__ __device__ la::vec3 World::RayTracing(Ray const& ray, int lev, la::vec3 coef)
 {
 	float dist = std::numeric_limits<float>::max();
 	Geometry* hitted = nullptr;
-	if (fabs(ray.GetDir().x) > 1.5f) {
+	if (fabs(ray.m_Dir.x) > 1.5f) {
 		printf("What?\n");
 	}
 	static_cast<Cuboid*>(Geometryrepository::GetGeo(m_Root))->TestHit(ray, dist, hitted);
 	if (hitted != nullptr) {
-		glm::vec3 hitpos = ray.GetPos() + ray.GetDir() * dist;
-		glm::vec3 att, wi, norm = hitted->GetNorm(hitpos);
+		la::vec3 hitpos = ray.m_Pos + ray.m_Dir * dist;
+		la::vec3 att, wi, norm = hitted->GetNorm(hitpos);
 		Material* mat = hitted->GetMaterial();
-		float poss = mat->scatter(hitpos, -ray.GetDir(),
+		float poss = mat->scatter(hitpos, -ray.m_Dir,
 			norm, att, wi);
-		//std::cout << coef * att * glm::dot(wi, norm) / poss << std::endl;
-		if (fabs(dist) > 1e3 || fabs(ray.GetDir().x) > 1.5f) {
+		//std::cout << coef * att * la::dot(wi, norm) / poss << std::endl;
+	//	if (fabs(dist) > 1e3 || fabs(ray.m_Dir.x) > 1.5f) {
 			// Impossible!
-			printf("What?\n");
-		}
+		//	printf("What?\n");
+		//}
 		/*if (hitted->GetType() == GeoType::Ball && lev == 1) {
-			std::cout << "Ray Dir: " << ray.GetDir();
+			std::cout << "Ray Dir: " << ray.m_Dir;
 			std::cout << "Norm: " << norm;
 			std::cout << "wi: " << wi;
-			std::cout << "cosines: " << glm::dot(wi, norm) << ' ' << glm::dot(-ray.GetDir(), norm) << std::endl;
+			std::cout << "cosines: " << la::dot(wi, norm) << ' ' << la::dot(-ray.m_Dir, norm) << std::endl;
 			std::cout << "Pos after hit: " << hitpos + wi * 1e-4f;
-			std::cout << "dist1: " << glm::l2Norm(hitpos - glm::vec3(1, 0, 0)) << std::endl;
-			std::cout << "dist2: " << glm::l2Norm(hitpos + wi * 1e-4f - glm::vec3(1, 0, 0)) << std::endl;
+			std::cout << "dist1: " << la::l2Norm(hitpos - la::vec3(1, 0, 0)) << std::endl;
+			std::cout << "dist2: " << la::l2Norm(hitpos + wi * 1e-4f - la::vec3(1, 0, 0)) << std::endl;
 			std::cout << "Hitpos: " << hitpos;
 
-		//	assert(glm::dot(wi, ray.GetDir()) < 1e-8);
+		//	assert(la::dot(wi, ray.m_Dir) < 1e-8);
 		}*/
 		if(lev > 4) {
-			float rr = glm::clamp(fmax(coef.r, fmax(coef.g, coef.b)), 0.0f, 0.95f);
+			float rr = la::clamp(fmax(coef.x, fmax(coef.y, coef.z)), 0.0f, 0.95f);
 			if (lev > 30 || Random::Rand(1.0f) > rr) return coef * mat->GetGlow();	
 			coef = coef / rr;
-		//	return coef / rr * mat->GetGlow() +
-		//		RayTracing(Ray(hitpos + wi * 1e-4f, wi), lev + 1, coef * att * fabs(glm::dot(wi, norm)) / poss) / rr;
 		}
 		return coef * mat->GetGlow() +
-			RayTracing(Ray(hitpos + wi * 1e-4f, wi), lev + 1, coef * att * fabs(glm::dot(wi, norm)) / poss);
+			RayTracing(Ray(hitpos + wi * 1e-4f, wi), lev + 1, coef * att * fabs(la::dot(wi, norm)) / poss);
 	}
 	else return coef * m_Background;
 }
 
-void World::ComputeInfo(Geometry* geo, glm::vec3& cent, float& area) {
+void World::ComputeInfo(Geometry* geo, la::vec3& cent, float& area) {
 	switch (geo->GetType()) {
 	case GeoType::Ball: {
 		auto* ball = static_cast<Ball*>(geo);
-		cent = ball->GetCenter();
-		area = (float)(4 * pi * pow(ball->GetRadius(), 2));
+		cent = ball->m_Center;
+		area = (float)(4 * pi * pow(ball->m_Radius, 2));
 		break;
 	}
 	case GeoType::Triangle: {
 		auto* tri = static_cast<Triangle*>(geo);
 		cent = (tri->GetPos(0) + tri->GetPos(1) + tri->GetPos(2)) / 3.0f;
-		area = glm::l2Norm(glm::cross(tri->GetPos(1) - tri->GetPos(0), tri->GetPos(2) - tri->GetPos(0))) / 2.0f;
+		area = la::l2Norm(la::cross(tri->GetPos(1) - tri->GetPos(0), tri->GetPos(2) - tri->GetPos(0))) / 2.0f;
 		break;
 	}
 	case GeoType::Cuboid: {
@@ -98,7 +96,7 @@ size_t World::DoCreateHierarchy(size_t beg, size_t ed) {
 		return m_Geos.size() - 1;
 	}
 	// Otherwise, find the best setting
-	int bestdim = 0, bestpos = 0;
+	size_t bestdim = 0, bestpos = 0;
 	float Fbest = std::numeric_limits<float>().max();
 	float Stot = 0;
 	for (size_t j = beg; j < ed; ++j) {
