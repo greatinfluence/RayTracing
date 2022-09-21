@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <thread>
+#include <device_atomic_functions.h>
 
 #include "Geometryrepository.h"
 #include "Raytracer.h"
@@ -15,8 +16,8 @@ namespace GPURenderer {
 		curand_init(19260817, idx, 0,  &state[idx]);
 	}
 
-	__global__ void Dorender(Camera* pcam, la::vec3* pbg, size_t root, int width, int height,
-		la::vec3* pixels, int nrays, curandState* states) {
+	__global__ static void Dorender(Camera* pcam, la::vec3* pbg, size_t root, int width, int height,
+		la::vec3* pixels, int nrays, curandState* states, volatile int* progress) {
 		int i = threadIdx.x + blockIdx.x * blockDim.x;
 		int j = threadIdx.y + blockIdx.y * blockDim.y;
 		auto idx = j + i * height;
@@ -30,7 +31,11 @@ namespace GPURenderer {
 			//	ray.GetDir().x, ray.GetDir().y, ray.GetDir().z);
 			col += Raytracing::RayTracing(ray, cub, bg, states[idx]);
 		}
-		pixels[idx] = col / (float)nrays;
+		pixels[idx] = sqrt(col / (float)nrays); // Gamma correction
+		if (!(threadIdx.x || threadIdx.y)) {
+			atomicAdd((int*)progress, 1);
+			__threadfence_system();
+		}
 	}
 
 	void Render(World& world, Image3& output, int nrays) {
@@ -66,8 +71,24 @@ namespace GPURenderer {
 		render_init <<<blocks, threads >>> (width, height, curandstates);
 		checkCudaErrors(cudaDeviceSynchronize());
 		printf("Finish randstate init\n");
-		checkCudaErrors(cudaDeviceSetLimit(cudaLimitStackSize, 8192 << 1));
-		Dorender <<<blocks, threads>>> (pcam, pbg, root, width, height, pixels, nrays, curandstates);
+		checkCudaErrors(cudaDeviceSetLimit(cudaLimitStackSize, 8192 << 1)); // Add stack size
+		volatile int* d_prog = nullptr;
+		volatile int* progress = nullptr;
+		int nblocks = blocks.x * blocks.y;
+		checkCudaErrors(cudaHostAlloc((void**)&progress, sizeof(int), cudaHostAllocMapped));
+		checkCudaErrors(cudaHostGetDevicePointer((int**)&d_prog, (int*)progress, 0));
+		*progress = 0;
+		Dorender <<<blocks, threads>>> (pcam, pbg, root, width, height, pixels, nrays, curandstates, d_prog);
+		printf("Progress:\n");
+		float lastprogress = 0.0f;
+		do {
+			int val1 = *progress;
+			float kern_progress = (float)val1 / nblocks;
+			if (kern_progress - lastprogress > 0.05f) {
+				printf("percent complete: %2.2f %%\n", kern_progress * 100);
+				lastprogress = kern_progress;
+			}
+		} while (lastprogress < 0.95f);
 		checkCudaErrors(cudaDeviceSynchronize());
 		printf("Finish rendering\n");
 		auto cpupixels = new la::vec3[npixels];
