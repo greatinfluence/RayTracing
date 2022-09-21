@@ -30,7 +30,7 @@ namespace Geometryrepository {
 		}
 	}
 
-	__global__ void CreateCubonGPU(Geometry*& place, glm::vec3 mins, glm::vec3 maxs,
+	__global__ void CreateCubonGPU(Geometry*& place, la::vec3 mins, la::vec3 maxs,
 		size_t nsubgeo, size_t* subgeos, size_t matid) {
 		auto cub = new Cuboid;
 		for (auto i = 0; i < 3; ++i) {
@@ -43,14 +43,14 @@ namespace Geometryrepository {
 		place = cub;
 	}
 
-	__global__ void CreateBallonGPU(Geometry*& place, glm::vec3 cent, float rad, size_t matid) {
+	__global__ void CreateBallonGPU(Geometry*& place, la::vec3 cent, float rad, size_t matid) {
 		auto ball = new Ball(cent, rad);
 		ball->AddMaterial(matid);
 		place = ball;
 	}
 
-	__global__ void CreateTriangleonGPU(Geometry*& place, glm::vec3 v1, glm::vec3 v2, glm::vec3 v3,
-		glm::vec3 norm, size_t matid) {
+	__global__ void CreateTriangleonGPU(Geometry*& place, la::vec3 v1, la::vec3 v2, la::vec3 v3,
+		la::vec3 norm, size_t matid) {
 		auto tri = new Triangle(v1, v2, v3, norm);
 		tri->AddMaterial(matid);
 		place = tri;
@@ -61,7 +61,7 @@ namespace Geometryrepository {
 			printf("Sendtogpu Error: The geometry has already sent to GPU!\n");
 		}
 		size_t size = m_Geos.size();
-		checkCudaErrors(cudaMallocManaged(&g_Geos_cpu, sizeof(Material*) * size));
+		checkCudaErrors(cudaMallocManaged(&g_Geos_cpu, sizeof(Geometry*) * size));
 		for (auto i = 0; i < size; ++i) {
 			switch (m_Geos[i]->GetType()) {
 			case GeoType::Cuboid: {
@@ -72,20 +72,20 @@ namespace Geometryrepository {
 					cudaMemcpyKind::cudaMemcpyHostToDevice));
 				m_Subs.push_back(ptr);
 				CreateCubonGPU<<<1, 1>>>(g_Geos_cpu[i],
-					glm::vec3(cub->GetMin(0), cub->GetMin(1), cub->GetMin(2)),
-					glm::vec3(cub->GetMax(0), cub->GetMax(1), cub->GetMax(2)),
+					la::vec3(cub->GetMin(0), cub->GetMin(1), cub->GetMin(2)),
+					la::vec3(cub->GetMax(0), cub->GetMax(1), cub->GetMax(2)),
 					cub->GetNsubgeo(), ptr, cub->GetMatid());
 				break;
 			}
 			case GeoType::Ball: {
 				auto ball = static_cast<Ball*>(m_Geos[i].get());
-				CreateBallonGPU<<<1, 1>>>(g_Geos_cpu[i], ball->GetCenter(), ball->GetRadius(), ball->GetMatid());
+				CreateBallonGPU<<<1, 1>>>(g_Geos_cpu[i], ball->m_Center, ball->m_Radius, ball->GetMatid());
 				break;
 			}
 			case GeoType::Triangle: {
 				auto tri = static_cast<Triangle*>(m_Geos[i].get());
 				CreateTriangleonGPU<<<1, 1>>>(g_Geos_cpu[i], tri->GetPos(0), tri->GetPos(1), tri->GetPos(2),
-					tri->GetNorm(glm::vec3(0)), tri->GetMatid());
+					tri->GetNorm(la::vec3(0)), tri->GetMatid());
 				break;
 			}
 			default: {

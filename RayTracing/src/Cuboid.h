@@ -13,7 +13,7 @@ public:
 	// AppendSubGeos(subgeos) appends all subgeos as sub-geometry into the cuboid
 	void AppendSubGeos(World const& world, std::vector<size_t> const& subgeos);
 	__host__ __device__ GeoType GetType() const override { return GeoType::Cuboid; }
-	__host__ __device__ glm::vec3 GetNorm(glm::vec3 pos) const override;
+	__host__ __device__ la::vec3 GetNorm(la::vec3 pos) const override;
 
 	// GetMin(dim) returns the minimum bound of the dimension dim
 	__host__ __device__ float GetMin(int dim) const { return m_Min[dim]; }
@@ -28,7 +28,10 @@ public:
 		TestHit(ray, dist, hitted) does the ray-hit detection among all the sub-geometries
 			returns the closest distance and the corresponding sub-geometry
 	*/
-	__host__ __device__ void TestHit(Ray const& ray, float& dist, Geometry*& hitted) const;
+	void TestHit(Ray const& ray, float& dist, Geometry*& hitted) const;
+
+	// TestHitdevice is the device version of TestHit
+	__device__ void TestHitdevice(Ray const& ray, float& dist, Geometry*& hitted) const;
 	
 	size_t GetSize() const override { return sizeof(Cuboid); };
 

@@ -8,7 +8,7 @@
 
 namespace GPURenderer {
 	void Render(World& world, Image3& output, int nrays = 32);
-	__global__ static void DoRender(size_t root, glm::vec3 bg, Camera& cam, int width, int height, glm::vec3* pixels,
+	__global__ static void DoRender(size_t root, la::vec3 bg, Camera& cam, int width, int height, la::vec3* pixels,
 		int nrays, curandState& state);
 }
 

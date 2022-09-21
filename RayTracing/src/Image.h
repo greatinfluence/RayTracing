@@ -3,7 +3,7 @@
 #include <string>
 
 #include "device_launch_parameters.h"
-#include "glm/vec3.hpp"
+#include "la.h"
 
 class Image3 {
 public:
@@ -18,11 +18,11 @@ public:
 	// Setcol(x, y, col, regularize) sets the color of the picture at the position (x, y)
 	//     if regularize = true, then the color vector will be considered to have been regularized
 	//     and use col * 255 as the color value
-	void Setcol(int x, int y, glm::vec3 col, bool regularize = false);
+	void Setcol(int x, int y, la::vec3 col, bool regularize = false);
 
 	// Readcol(x, y, regularize) returns the color of the picture at the position (x, y)
 	//     if regularize = true, then the return value will be regularized into the range [0, 1]
-	glm::vec3 Readcol(int x, int y, bool regularize = false);
+	la::vec3 Readcol(int x, int y, bool regularize = false);
 
 	// Write(filepath) will output the picture into filepath
 	//     Now accepts png and jpg formats

@@ -31,15 +31,15 @@ namespace Materialrepository {
 		}
 	}
 
-	__global__ void CreateDiffuseonGPU(Material*& place, glm::vec3 gloom, glm::vec3 albedo) {
+	__global__ void CreateDiffuseonGPU(Material*& place, la::vec3 gloom, la::vec3 albedo) {
 		place = new Diffuse(gloom, albedo);
 	}
 
-	__global__ void CreateMetalonGPU(Material*& place, glm::vec3 gloom, glm::vec3 albedo, float fuzz) {
+	__global__ void CreateMetalonGPU(Material*& place, la::vec3 gloom, la::vec3 albedo, float fuzz) {
 		place = new Metal(gloom, albedo, fuzz);
 	}
 
-	__global__ void CreateDieletriconGPU(Material*& place, glm::vec3 gloom, float ir) {
+	__global__ void CreateDieletriconGPU(Material*& place, la::vec3 gloom, float ir) {
 		place = new Dieletric(gloom, ir);
 	}
 

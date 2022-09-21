@@ -5,6 +5,6 @@
 
 namespace Raytracing {
 	// RayTracing(ray, lev, coef) traces the ray and returns the color seen by the ray
-	__device__ glm::vec3 RayTracing(Ray ray, size_t* root, glm::vec3 m_Background, curandState& state, int lev = 1, glm::vec3 coef = glm::vec3(1.0f));
+	__device__ la::vec3 RayTracing(Ray const& ray, Cuboid* cub, la::vec3 const& m_Background, curandState& state, int lev = 1, la::vec3 coef = la::vec3(1.0f));
 
 }

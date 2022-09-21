@@ -1,15 +1,14 @@
 #include "Cuboid.h"
 
 #include <limits>
-#include <iostream>
+#include <cassert>
 
+#include "la.h"
 #include "Ball.h"
 #include "Triangle.h"
 #include "Ray.h"
 #include "Settings.h"
 #include "Geometryrepository.h"
-
-#include "glm/gtx/norm.hpp"
 #include "World.h"
 
 __host__ __device__ Cuboid::Cuboid()
@@ -31,8 +30,8 @@ void Cuboid::AppendSubGeos(World const& world, std::vector<size_t> const& subgeo
 		}
 		case GeoType::Ball: {
 			auto* subba = static_cast<Ball*>(subgeo.get());
-			glm::vec3 cent = subba->GetCenter();
-			float r = subba->GetRadius();
+			la::vec3 cent = subba->m_Center;
+			float r = subba->m_Radius;
 			for (auto i = 0; i < 3; ++i) {
 				m_Min[i] = fmin(m_Min[i], cent[i] - r);
 				m_Max[i] = fmax(m_Max[i], cent[i] + r);
@@ -42,7 +41,7 @@ void Cuboid::AppendSubGeos(World const& world, std::vector<size_t> const& subgeo
 		case GeoType::Triangle: {
 			auto* subtr = static_cast<Triangle*>(subgeo.get());
 			for (auto i = 0; i < 3; ++i) {
-				glm::vec3 vert = subtr->GetPos(i);
+				la::vec3 vert = subtr->GetPos(i);
 				for (auto j = 0; j < 3; ++j) {
 					m_Min[j] = fmin(m_Min[j], vert[j]);
 					m_Max[j] = fmax(m_Max[j], vert[j]);
@@ -51,7 +50,7 @@ void Cuboid::AppendSubGeos(World const& world, std::vector<size_t> const& subgeo
 			break;
 		}
 		default: {
-			std::cout << "Unrecongnized Geometry Type!" << std::endl;
+			printf("Unrecongnized Geometry Type!\n");
 			return;
 		}
 		}
@@ -59,25 +58,33 @@ void Cuboid::AppendSubGeos(World const& world, std::vector<size_t> const& subgeo
 	}
 }
 
-__host__ __device__ glm::vec3 Cuboid::GetNorm(glm::vec3 pos) const
+__host__ __device__ la::vec3 Cuboid::GetNorm(la::vec3 pos) const
 {
 	printf("You should never call this function, since it's just a structural function\n");
-	return glm::vec3(0.0f);
+	return la::vec3(0.0f);
 }
 
-__host__ __device__ void Cuboid::TestHit(Ray const& ray, float& dist, Geometry*& hitted) const
+//__device__ static void TestRay(Ray ray) {
+//	assert(ray.Hit(nullptr) == -1);
+//}
+
+
+void Cuboid::TestHit(Ray const& ray, float& dist, Geometry*& hitted) const
 {
-	printf("The memory address of the Cuboid: %p\n", this);
-	printf("The type of Cuboid: %d\n", (int)GeoType::Cuboid);
-	printf("The type of this Cuboid: %d\n", (int)GetType());
-	printf("The type of this Cuboid: %d\n", (int)this->GetType());
-	printf("Cuboid: Receives the ray: (%f, %f, %f) -> (%f, %f, %f)\n", ray.GetPos().x, ray.GetPos().y, ray.GetPos().z, ray.GetDir().x, ray.GetDir().y, ray.GetDir().z);
-	if (ray.Hit(nullptr) != -1) {
-		printf("Bad hit test\n");
-	}
+//	printf("The memory address of the Cuboid: %p\n", this);
+//	printf("The type of Cuboid: %d\n", (int)GeoType::Cuboid);
+//	printf("The type of this Cuboid: %d\n", (int)GetType());
+//	printf("The type of this Cuboid: %d\n", (int)this->GetType());
+//#ifdef __CUDA_ARCH__
+//	TestRay(ray);
+//#endif
+	//printf("Cuboid: Receives the ray: (%f, %f, %f) -> (%f, %f, %f)\n", r.GetPos().x, r.GetPos().y, r.GetPos().z, r.GetDir().x, r.GetDir().y, r.GetDir().z);
+//	if (ray.Hit(nullptr) != -1) {
+//		printf("Bad hit test\n");
+//	}
 	if (ray.Hit(this) < dist) {
 		// It is possible for the ray to hit the box
-		printf("Cuboid: Has hit the ray\n");
+//		printf("Cuboid: Has hit the ray\n");
 		for(size_t i = 0; i < m_Nsubgeo; ++ i) {
 			auto geo = Geometryrepository::GetGeo(m_Subgeoid[i]);
 			if (geo->GetType() == GeoType::Cuboid) {
@@ -94,7 +101,40 @@ __host__ __device__ void Cuboid::TestHit(Ray const& ray, float& dist, Geometry*&
 				}
 			}
 		}
-		printf("Cuboid: End hit refreshing\n");
+//		printf("Cuboid: End hit refreshing\n");
 	}
-	printf("Cuboid: End ray testing\n");
+//	printf("Cuboid: End ray testing\n");
+}
+
+__device__ void Cuboid::TestHitdevice(Ray const& ray, float& dist, Geometry*& hitted) const
+{
+	//printf("The memory address of the Cuboid: %p\n", this);
+	//printf("The type of Cuboid: %d\n", (int)GeoType::Cuboid);
+	//printf("The type of this Cuboid: %d\n", (int)GetType());
+	//printf("The type of this Cuboid: %d\n", (int)this->GetType());
+	//printf("Min: %f %f %f\n", m_Min[0], m_Min[1], m_Min[2]);
+	//printf("Max: %f %f %f\n", m_Max[0], m_Max[1], m_Max[2]);
+	//printf("Cuboid: Receives the ray: (%f, %f, %f) -> (%f, %f, %f)\n", m_Pos.x, m_Pos.y, m_Pos.z, m_Dir.x, m_Dir.y, m_Dir.z);
+	if (ray.Hit(this) < dist) {
+		// It is possible for the ray to hit the box
+		//printf("Cuboid: Has hit the ray\n");
+		for (size_t i = 0; i < m_Nsubgeo; ++ i) {
+			auto geo = Geometryrepository::GetGeo(m_Subgeoid[i]);
+			if (geo->GetType() == GeoType::Cuboid) {
+				// A sublevel of Cuboid
+				auto* cub = static_cast<Cuboid*>(geo);
+				cub->TestHitdevice(ray, dist, hitted);
+			}
+			else {
+				// A common object
+				float ndist = ray.Hit(geo);
+				if (ndist < dist) {
+					dist = ndist;
+					hitted = geo;
+				}
+			}
+		}
+		//printf("Cuboid: End hit refreshing\n");
+	}
+	//printf("Cuboid: End ray testing\n");
 }

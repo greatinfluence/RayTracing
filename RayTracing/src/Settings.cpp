@@ -10,5 +10,3 @@ void check_cuda(cudaError_t result, char const* const func, const char* const fi
         exit(99);
     }
 }
-
-__host__ __device__ float sq(float x) { return x * x; }

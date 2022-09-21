@@ -23,7 +23,7 @@ constexpr float floatmax = std::numeric_limits<float>().max();
 constexpr float floatmin = std::numeric_limits<float>().min();
 
 // sq(x) returns x * x
-__host__ __device__ float sq(float x);
+__host__ __device__ inline float sq(float x) { return x * x; }
 
 /*
     formatDuration(d) formats the time duration into the form xx:xx:xx

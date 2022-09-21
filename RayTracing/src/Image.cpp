@@ -62,25 +62,25 @@ Image3::~Image3()
 	if(m_Data != nullptr) delete[] m_Data;
 }
 
-void Image3::Setcol(int x, int y, glm::vec3 col, bool regularize)
+void Image3::Setcol(int x, int y, la::vec3 col, bool regularize)
 {
 	if (regularize) {
-		col *= 255;
+		col *= 255.0f;
 	}
 	y = m_Height - 1 - y; // Flip the paint
 	unsigned char* pos = m_Data + (y * m_Width + x) * m_Channels;
-	*pos = (unsigned char)round(col.r);
-	*(pos + 1) = (unsigned char)round(col.g);
-	*(pos + 2) = (unsigned char)round(col.b);
+	*pos = (unsigned char)round(col.x);
+	*(pos + 1) = (unsigned char)round(col.y);
+	*(pos + 2) = (unsigned char)round(col.z);
 }
 
-glm::vec3 Image3::Readcol(int x, int y, bool regularize)
+la::vec3 Image3::Readcol(int x, int y, bool regularize)
 {
 	y = m_Height - 1 - y; // Flip the paint
 	unsigned char* pos = m_Data + (y * m_Width + x) * m_Channels;
-	auto col = glm::vec3(*pos, *(pos + 1), *(pos + 2));
+	auto col = la::vec3(*pos, *(pos + 1), *(pos + 2));
 	if (regularize) {
-		col /= 255;
+		col /= 255.0f;
 	}
 	return col;
 }
