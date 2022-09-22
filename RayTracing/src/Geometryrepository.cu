@@ -102,7 +102,8 @@ namespace Geometryrepository {
 		}
 		checkCudaErrors(cudaMemcpyToSymbol(g_Geos, &g_Geos_cpu, sizeof(Material**), 0,
 			cudaMemcpyKind::cudaMemcpyHostToDevice));
-		Transferidtogeo<<<8, 8>>>(size);
+		dim3 tr(32), blk(size/32 + 1);
+		Transferidtogeo<<<blk, tr>>>(size);
 	}
 
 	__host__ __device__ Geometry* GetGeo(size_t geoid) {

@@ -20,6 +20,7 @@ namespace GPURenderer {
 		la::vec3* pixels, int nrays, curandState* states, volatile int* progress) {
 		int i = threadIdx.x + blockIdx.x * blockDim.x;
 		int j = threadIdx.y + blockIdx.y * blockDim.y;
+	//	printf("+ %d %d\n", i, j);
 		auto idx = j + i * height;
 		if ((i >= width) || (j >= height)) return;
 		auto col = la::vec3(0);
@@ -36,6 +37,7 @@ namespace GPURenderer {
 			atomicAdd((int*)progress, 1);
 			__threadfence_system();
 		}
+	//	printf("- %d %d\n", i, j);
 	}
 
 	void Render(World& world, Image3& output, int nrays) {
@@ -78,6 +80,7 @@ namespace GPURenderer {
 		checkCudaErrors(cudaHostAlloc((void**)&progress, sizeof(int), cudaHostAllocMapped));
 		checkCudaErrors(cudaHostGetDevicePointer((int**)&d_prog, (int*)progress, 0));
 		*progress = 0;
+		printf("Start rendering\n");
 		Dorender <<<blocks, threads>>> (pcam, pbg, root, width, height, pixels, nrays, curandstates, d_prog);
 		printf("Progress:\n");
 		float lastprogress = 0.0f;

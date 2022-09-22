@@ -119,7 +119,7 @@ __device__ void Cuboid::TestHitdevice(Ray const& ray, float& dist, Geometry cons
 		// It is possible for the ray to hit the box
 		//printf("Cuboid: Has hit the ray\n");
 		for (size_t i = 0; i < m_Nsubgeo; ++ i) {
-			auto const* geo = m_Subgeoid[i].geo;
+			Geometry const* geo = m_Subgeoid[i].geo;
 			if (geo->GetType() == GeoType::Cuboid) {
 				// A sublevel of Cuboid
 				auto* cub = static_cast<Cuboid const*>(geo);
