@@ -16,7 +16,7 @@ __host__ __device__ Cuboid::Cuboid()
 	m_Nsubgeo{ 0 }, m_Subgeoid{nullptr} {}
 
 void Cuboid::AppendSubGeos(World const& world, std::vector<size_t> const& subgeos) {
-	m_Subgeoid = new size_t[subgeos.size()];
+	m_Subgeoid = new sizet_or_geoptr[subgeos.size()];
 	for (size_t subgeoid : subgeos) {
 		auto subgeo = world.GetGeo(subgeoid);
 		switch (subgeo->GetType()) {
@@ -54,7 +54,7 @@ void Cuboid::AppendSubGeos(World const& world, std::vector<size_t> const& subgeo
 			return;
 		}
 		}
-		m_Subgeoid[m_Nsubgeo ++] = subgeoid;
+		m_Subgeoid[m_Nsubgeo ++].id = subgeoid;
 	}
 }
 
@@ -86,7 +86,7 @@ void Cuboid::TestHit(Ray const& ray, float& dist, Geometry const*& hitted) const
 		// It is possible for the ray to hit the box
 //		printf("Cuboid: Has hit the ray\n");
 		for(size_t i = 0; i < m_Nsubgeo; ++ i) {
-			auto geo = Geometryrepository::GetGeo(m_Subgeoid[i]);
+			auto geo = Geometryrepository::GetGeo(m_Subgeoid[i].id);
 			if (geo->GetType() == GeoType::Cuboid) {
 				// A sublevel of Cuboid
 				auto* cub = static_cast<Cuboid const*>(geo);
@@ -119,7 +119,7 @@ __device__ void Cuboid::TestHitdevice(Ray const& ray, float& dist, Geometry cons
 		// It is possible for the ray to hit the box
 		//printf("Cuboid: Has hit the ray\n");
 		for (size_t i = 0; i < m_Nsubgeo; ++ i) {
-			auto geo = Geometryrepository::GetGeo(m_Subgeoid[i]);
+			auto const* geo = m_Subgeoid[i].geo;
 			if (geo->GetType() == GeoType::Cuboid) {
 				// A sublevel of Cuboid
 				auto* cub = static_cast<Cuboid const*>(geo);
@@ -137,4 +137,11 @@ __device__ void Cuboid::TestHitdevice(Ray const& ray, float& dist, Geometry cons
 		//printf("Cuboid: End hit refreshing\n");
 	}
 	//printf("Cuboid: End ray testing\n");
+}
+
+__device__ void Cuboid::Transferidtogeo()
+{
+	for (int i = 0; i < m_Nsubgeo; ++i) {
+		m_Subgeoid[i].geo = Geometryrepository::GetGeo(m_Subgeoid[i].id);
+	}
 }

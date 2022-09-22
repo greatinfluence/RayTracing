@@ -4,7 +4,7 @@ namespace Geometryrepository {
 	__device__ Geometry** g_Geos;
 	Geometry** g_Geos_cpu;
 	std::vector<std::shared_ptr<Geometry>> m_Geos;
-	std::vector<size_t*> m_Subs;
+	std::vector<Cuboid::sizet_or_geoptr*> m_Subs;
 
 	void Initiate(World const& world) {
 		size_t size = world.GetNgeo();
@@ -31,7 +31,7 @@ namespace Geometryrepository {
 	}
 
 	__global__ void CreateCubonGPU(Geometry*& place, la::vec3 mins, la::vec3 maxs,
-		size_t nsubgeo, size_t* subgeos, size_t matid) {
+		size_t nsubgeo, Cuboid::sizet_or_geoptr* subgeos, size_t matid) {
 		auto cub = new Cuboid;
 		for (auto i = 0; i < 3; ++i) {
 			cub->m_Min[i] = mins[i];
@@ -56,6 +56,13 @@ namespace Geometryrepository {
 		place = tri;
 	}
 
+	__global__ void Transferidtogeo(size_t size) {
+		int ind = threadIdx.x + blockIdx.x * blockDim.x;
+		if (ind < size && g_Geos[ind]->GetType() == GeoType::Cuboid) {
+			static_cast<Cuboid*>(g_Geos[ind])->Transferidtogeo();
+		}
+	}
+
 	void Sendtogpu() {
 		if (g_Geos_cpu != nullptr) {
 			printf("Sendtogpu Error: The geometry has already sent to GPU!\n");
@@ -66,9 +73,9 @@ namespace Geometryrepository {
 			switch (m_Geos[i]->GetType()) {
 			case GeoType::Cuboid: {
 				auto cub = static_cast<Cuboid*>(m_Geos[i].get());
-				size_t* ptr = nullptr;
-				checkCudaErrors(cudaMalloc(&ptr, sizeof(size_t) * (cub->m_Nsubgeo)));
-				checkCudaErrors(cudaMemcpy(ptr, cub->m_Subgeoid, sizeof(size_t) * (cub->m_Nsubgeo),
+				Cuboid::sizet_or_geoptr* ptr = nullptr;
+				checkCudaErrors(cudaMalloc(&ptr, sizeof(Cuboid::sizet_or_geoptr) * (cub->m_Nsubgeo)));
+				checkCudaErrors(cudaMemcpy(ptr, cub->m_Subgeoid, sizeof(Cuboid::sizet_or_geoptr) * (cub->m_Nsubgeo),
 					cudaMemcpyKind::cudaMemcpyHostToDevice));
 				m_Subs.push_back(ptr);
 				CreateCubonGPU<<<1, 1>>>(g_Geos_cpu[i],
@@ -95,6 +102,7 @@ namespace Geometryrepository {
 		}
 		checkCudaErrors(cudaMemcpyToSymbol(g_Geos, &g_Geos_cpu, sizeof(Material**), 0,
 			cudaMemcpyKind::cudaMemcpyHostToDevice));
+		Transferidtogeo<<<8, 8>>>(size);
 	}
 
 	__host__ __device__ Geometry* GetGeo(size_t geoid) {

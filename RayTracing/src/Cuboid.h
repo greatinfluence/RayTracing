@@ -24,11 +24,16 @@ public:
 	// TestHitdevice is the device version of TestHit
 	__device__ void TestHitdevice(Ray const& ray, float& dist, Geometry const*& hitted) const;
 	
+	// Transferidtogeo() transfers the storage of subgeoids into the geometries
+	__device__ void Transferidtogeo();
+
 	size_t GetSize() const override { return sizeof(Cuboid); };
+
+	using sizet_or_geoptr = union { size_t id; Geometry* geo; };
 
 	float m_Min[3], m_Max[3];
 	size_t m_Nsubgeo;
-	size_t* m_Subgeoid;
+	sizet_or_geoptr* m_Subgeoid;
 };
 
 
