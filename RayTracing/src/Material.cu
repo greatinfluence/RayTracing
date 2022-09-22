@@ -34,8 +34,11 @@ __host__ __device__ float Metal::scatter(la::vec3 pos, la::vec3 wo, la::vec3 nor
 #else
     wi = la::reflect(-wo, norm) + Random::RandinSphere(m_Fuzz);
 #endif
-    if (la::dot(wo, norm) < eps && la::dot(wi, norm) > -eps ||
-        la::dot(wo, norm) > -eps && la::dot(wi, norm) < eps) {
+    //if (m_Fuzz > 0.05f) {
+     //   printf("(%f %f %f) - (%f %f %f) -> (%f %f %f)\n %f, %f, %f\n", wo.x, wo.y, wo.z, norm.x, norm.y, norm.z, wi.x, wi.y, wi.z, m_Fuzz, la::dot(wi, norm), la::dot(wo, norm));
+   // }
+    if (la::dot(wo, norm) > -eps && la::dot(wi, norm) > -eps ||
+        la::dot(wo, norm) < eps && la::dot(wi, norm) < eps) {
         // Being absorbed
             attenuation = la::vec3(0.0f);
             wi = la::vec3(1.0f, 0, 0);

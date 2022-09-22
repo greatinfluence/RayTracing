@@ -243,6 +243,7 @@
     <None Include="cpp.hint" />
     <None Include="redballconfig.yaml" />
     <None Include="src\twoballsconfig.yaml" />
+    <None Include="twoballsconfig.yaml" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />

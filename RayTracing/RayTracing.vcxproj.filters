@@ -261,6 +261,7 @@
     <None Include="1000ballsconfig.yaml" />
     <None Include="cpp.hint" />
     <None Include="redballconfig.yaml" />
+    <None Include="twoballsconfig.yaml" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\vendor\stb_image\stb_image.cpp">

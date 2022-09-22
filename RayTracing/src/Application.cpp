@@ -8,7 +8,7 @@
 #include "Random.h"
 
 int main() {
-	int nrays = 1024 ;
+	int nrays = 1024;
 	/*
 	Image3 img(512, 256);
 	World world(Camera(la::vec3(0), la::vec3(1, 0, 0), la::vec3(0, 1, 0)), la::vec3(1.0f));
@@ -71,13 +71,14 @@ int main() {
 	*/
 	Image3 img;
 	World world;
-	YAML::Loadscene("1000ballsconfig.yaml", world, img);
+	YAML::Loadscene("twoballsconfig.yaml", world, img);
 	
 	using namespace std::chrono;
-	//Renderer renderer;
+//	Renderer renderer;
 	auto start = high_resolution_clock::now();
+//	renderer.Render(world, img, nrays);
 	GPURenderer::Render(world, img, nrays);
-	img.Write("testpic2.png");
+	img.Write("testpic.png");
 	auto stop = high_resolution_clock::now();
 	std::cout << "Rendering finished. Time using: ";
 
