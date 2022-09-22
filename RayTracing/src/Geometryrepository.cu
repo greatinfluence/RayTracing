@@ -34,8 +34,8 @@ namespace Geometryrepository {
 		size_t nsubgeo, size_t* subgeos, size_t matid) {
 		auto cub = new Cuboid;
 		for (auto i = 0; i < 3; ++i) {
-			cub->SetMin(i, mins[i]);
-			cub->SetMax(i, maxs[i]);
+			cub->m_Min[i] = mins[i];
+			cub->m_Max[i] = maxs[i];
 		}
 		cub->SetNsubgeo(nsubgeo);
 		cub->SetSubgeoid(subgeos);
@@ -72,8 +72,8 @@ namespace Geometryrepository {
 					cudaMemcpyKind::cudaMemcpyHostToDevice));
 				m_Subs.push_back(ptr);
 				CreateCubonGPU<<<1, 1>>>(g_Geos_cpu[i],
-					la::vec3(cub->GetMin(0), cub->GetMin(1), cub->GetMin(2)),
-					la::vec3(cub->GetMax(0), cub->GetMax(1), cub->GetMax(2)),
+					la::vec3(cub->m_Min[0], cub->m_Min[1], cub->m_Min[2]),
+					la::vec3(cub->m_Max[0], cub->m_Max[1], cub->m_Max[2]),
 					cub->GetNsubgeo(), ptr, cub->GetMatid());
 				break;
 			}

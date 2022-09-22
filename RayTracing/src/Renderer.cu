@@ -66,7 +66,7 @@ namespace GPURenderer {
 
 		printf("Finish memory allocating\n");
 		int const tx = 16, ty = 16;
-		dim3 const blocks(width / tx + 1, height / ty + 1);
+		dim3 const blocks((width + 1)/ tx, (height + 1) / ty);
 		dim3 const threads(tx, ty);
 		render_init <<<blocks, threads >>> (width, height, curandstates);
 		checkCudaErrors(cudaDeviceSynchronize());
@@ -88,7 +88,8 @@ namespace GPURenderer {
 				printf("percent complete: %2.2f %%\n", kern_progress * 100);
 				lastprogress = kern_progress;
 			}
-		} while (lastprogress < 0.95f);
+			//printf("%d %d\n", *progress, nblocks);
+		} while (lastprogress < 0.94f && (*progress) < nblocks);
 		checkCudaErrors(cudaDeviceSynchronize());
 		printf("Finish rendering\n");
 		auto cpupixels = new la::vec3[npixels];

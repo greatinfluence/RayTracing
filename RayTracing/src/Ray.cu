@@ -56,7 +56,7 @@ __device__ inline static float Hitcuboid(Ray const& ray, Cuboid const* cub) {
 	float diff[3] = {};
 
 	for (auto i = 0; i < 3; ++i) {
-		float min = cub->GetMin(i), max = cub->GetMax(i);
+		float min = cub->m_Min[i], max = cub->m_Max[i];
 		if (m_Pos[i] < min) {
 			quadrant[i] = Quadrant::Left;
 			candidatePlane[i] = min;
@@ -95,7 +95,7 @@ __device__ inline static float Hitcuboid(Ray const& ray, Cuboid const* cub) {
 	for (auto i = 0; i < 3; ++i) {
 		if (whichPlane != i) {
 			float hitpos = m_Pos[i] + diff[whichPlane] * m_Dir[i];
-			if (hitpos < cub->GetMin(i) || hitpos > cub->GetMax(i))
+			if (hitpos < cub->m_Min[i] || hitpos > cub->m_Max[i])
 				return floatmax;
 		}
 	}
@@ -233,7 +233,7 @@ float Hithost(Ray const& ray, Geometry const* geo) {
 		float diff[3] = {};
 
 		for (auto i = 0; i < 3; ++i) {
-			float min = cub->GetMin(i), max = cub->GetMax(i);
+			float min = cub->m_Min[i], max = cub->m_Max[i];
 			if (m_Pos[i] < min) {
 				quadrant[i] = Quadrant::Left;
 				candidatePlane[i] = min;
@@ -269,7 +269,7 @@ float Hithost(Ray const& ray, Geometry const* geo) {
 		for (auto i = 0; i < 3; ++i) {
 			if (whichPlane != i) {
 				float hitpos = m_Pos[i] + diff[whichPlane] * m_Dir[i];
-				if (hitpos < cub->GetMin(i) || hitpos > cub->GetMax(i))
+				if (hitpos < cub->m_Min[i] || hitpos > cub->m_Max[i])
 					return std::numeric_limits<float>().max();
 			}
 		}

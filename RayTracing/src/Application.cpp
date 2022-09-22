@@ -8,7 +8,7 @@
 #include "Random.h"
 
 int main() {
-	int nrays = 1024;
+	int nrays = 1;
 	/*
 	Image3 img(512, 256);
 	World world(Camera(la::vec3(0), la::vec3(1, 0, 0), la::vec3(0, 1, 0)), la::vec3(1.0f));
@@ -71,7 +71,7 @@ int main() {
 	*/
 	Image3 img;
 	World world;
-	YAML::Loadscene("1000ballsconfig.yaml", world, img);
+	YAML::Loadscene("redballconfig.yaml", world, img);
 	
 	using namespace std::chrono;
 	//Renderer renderer;
