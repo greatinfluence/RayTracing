@@ -25,7 +25,7 @@ __host__ __device__ la::vec3 World::RayTracing(Ray const& ray, int lev, la::vec3
 	if (hitted != nullptr) {
 		la::vec3 hitpos = ray.m_Pos + ray.m_Dir * dist;
 		la::vec3 att, wi, norm = hitted->GetNorm(hitpos);
-		Material* mat = hitted->GetMaterial();
+		Material* mat = hitted->m_Matid.mat;
 		float poss = mat->scatter(hitpos, -ray.m_Dir,
 			norm, att, wi);
 		//std::cout << coef * att * la::dot(wi, norm) / poss << std::endl;

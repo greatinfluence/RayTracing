@@ -56,10 +56,13 @@ namespace Geometryrepository {
 		place = tri;
 	}
 
-	__global__ void Transferidtogeo(size_t size) {
+	__global__ void Transferids(size_t size) {
 		int ind = threadIdx.x + blockIdx.x * blockDim.x;
-		if (ind < size && g_Geos[ind]->GetType() == GeoType::Cuboid) {
-			static_cast<Cuboid*>(g_Geos[ind])->Transferidtogeo();
+		if (ind < size) {
+			g_Geos[ind]->Transferidtomat();
+			if (g_Geos[ind]->GetType() == GeoType::Cuboid) {
+				static_cast<Cuboid*>(g_Geos[ind])->Transferidtogeo();
+			}
 		}
 	}
 
@@ -81,18 +84,18 @@ namespace Geometryrepository {
 				CreateCubonGPU<<<1, 1>>>(g_Geos_cpu[i],
 					la::vec3(cub->m_Min[0], cub->m_Min[1], cub->m_Min[2]),
 					la::vec3(cub->m_Max[0], cub->m_Max[1], cub->m_Max[2]),
-					cub->m_Nsubgeo, ptr, cub->GetMatid());
+					cub->m_Nsubgeo, ptr, cub->m_Matid.id);
 				break;
 			}
 			case GeoType::Ball: {
 				auto ball = static_cast<Ball*>(m_Geos[i].get());
-				CreateBallonGPU<<<1, 1>>>(g_Geos_cpu[i], ball->m_Center, ball->m_Radius, ball->GetMatid());
+				CreateBallonGPU<<<1, 1>>>(g_Geos_cpu[i], ball->m_Center, ball->m_Radius, ball->m_Matid.id);
 				break;
 			}
 			case GeoType::Triangle: {
 				auto tri = static_cast<Triangle*>(m_Geos[i].get());
 				CreateTriangleonGPU<<<1, 1>>>(g_Geos_cpu[i], tri->GetPos(0), tri->GetPos(1), tri->GetPos(2),
-					tri->GetNorm(la::vec3(0)), tri->GetMatid());
+					tri->GetNorm(la::vec3(0)), tri->m_Matid.id);
 				break;
 			}
 			default: {
@@ -103,7 +106,7 @@ namespace Geometryrepository {
 		checkCudaErrors(cudaMemcpyToSymbol(g_Geos, &g_Geos_cpu, sizeof(Material**), 0,
 			cudaMemcpyKind::cudaMemcpyHostToDevice));
 		dim3 tr(32), blk(size/32 + 1);
-		Transferidtogeo<<<blk, tr>>>(size);
+		Transferids<<<blk, tr>>>(size);
 	}
 
 	__host__ __device__ Geometry* GetGeo(size_t geoid) {

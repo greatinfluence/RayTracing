@@ -22,16 +22,19 @@ public:
 	// GetNorm(pos) returns the normal vector of the geometry at position pos
 	__host__ __device__ virtual la::vec3 GetNorm(la::vec3 pos) const = 0;
 
-	__host__ __device__ Material* GetMaterial() const { return Materialrepository::GetMat(m_Matid); }
-
-	__host__ __device__ uint32_t GetMatid() const { return m_Matid; }
-
 	virtual size_t GetSize() const = 0;
 
 	// AddMaterial(mat) adds the material to the geometry
 	__host__ __device__ void AddMaterial(uint32_t matid) {
-		m_Matid = matid;
+		m_Matid.id = matid;
 	}
-protected:
-	uint32_t m_Matid;
+
+	using sizet_or_matptr = union { size_t id; Material* mat; };
+
+	// Transferidtomat() transfers the storage of matid into material 
+	__device__ void Transferidtomat() {
+		m_Matid.mat = Materialrepository::GetMat(m_Matid.id);
+	}
+
+	sizet_or_matptr m_Matid;
 };

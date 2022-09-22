@@ -141,7 +141,7 @@ namespace YAML {
 			}
 			Node node;
 			node["Type"] = geo->GetType();
-			node["Material"] = geo->GetMatid();
+			node["Material"] = geo->m_Matid.id;
 			switch (geo->GetType()) {
 			case GeoType::Ball: {
 				auto ball = static_cast<Ball*>(geo.get());

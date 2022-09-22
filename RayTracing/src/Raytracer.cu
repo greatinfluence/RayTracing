@@ -10,7 +10,7 @@ __device__ la::vec3 Raytracing::RayTracing(Ray const& ray, Cuboid* cub, la::vec3
 	if (hitted != nullptr) {
 		la::vec3 hitpos = ray.m_Pos + ray.m_Dir * dist;
 		la::vec3 att, wi, norm = hitted->GetNorm(hitpos);
-		Material* mat = hitted->GetMaterial();
+		Material* mat = hitted->m_Matid.mat;
 		float poss = mat->scatter(hitpos, -ray.m_Dir,
 			norm, att, wi, &state);
 	//	if (fabs(dist) > 1e3 || fabs(ray.m_Dir.x) > 1.5f) {
