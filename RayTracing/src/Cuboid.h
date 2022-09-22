@@ -26,10 +26,6 @@ public:
 	
 	size_t GetSize() const override { return sizeof(Cuboid); };
 
-	__host__ __device__ size_t* GetSubgeoids() const { return m_Subgeoid; }
-	__host__ __device__ size_t GetNsubgeo() const { return m_Nsubgeo; }
-	__host__ __device__ void SetSubgeoid(size_t* subgeoid) { m_Subgeoid = subgeoid; }
-	__host__ __device__ void SetNsubgeo(size_t nsubgeo) { m_Nsubgeo = nsubgeo; }
 	float m_Min[3], m_Max[3];
 	size_t m_Nsubgeo;
 	size_t* m_Subgeoid;

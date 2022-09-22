@@ -37,8 +37,8 @@ namespace Geometryrepository {
 			cub->m_Min[i] = mins[i];
 			cub->m_Max[i] = maxs[i];
 		}
-		cub->SetNsubgeo(nsubgeo);
-		cub->SetSubgeoid(subgeos);
+		cub->m_Nsubgeo = nsubgeo;
+		cub->m_Subgeoid = subgeos;
 		cub->AddMaterial(matid);
 		place = cub;
 	}
@@ -67,14 +67,14 @@ namespace Geometryrepository {
 			case GeoType::Cuboid: {
 				auto cub = static_cast<Cuboid*>(m_Geos[i].get());
 				size_t* ptr = nullptr;
-				checkCudaErrors(cudaMalloc(&ptr, sizeof(size_t) * (cub->GetNsubgeo())));
-				checkCudaErrors(cudaMemcpy(ptr, cub->GetSubgeoids(), sizeof(size_t) * (cub->GetNsubgeo()),
+				checkCudaErrors(cudaMalloc(&ptr, sizeof(size_t) * (cub->m_Nsubgeo)));
+				checkCudaErrors(cudaMemcpy(ptr, cub->m_Subgeoid, sizeof(size_t) * (cub->m_Nsubgeo),
 					cudaMemcpyKind::cudaMemcpyHostToDevice));
 				m_Subs.push_back(ptr);
 				CreateCubonGPU<<<1, 1>>>(g_Geos_cpu[i],
 					la::vec3(cub->m_Min[0], cub->m_Min[1], cub->m_Min[2]),
 					la::vec3(cub->m_Max[0], cub->m_Max[1], cub->m_Max[2]),
-					cub->GetNsubgeo(), ptr, cub->GetMatid());
+					cub->m_Nsubgeo, ptr, cub->GetMatid());
 				break;
 			}
 			case GeoType::Ball: {
