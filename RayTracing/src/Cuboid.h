@@ -19,10 +19,10 @@ public:
 		TestHit(ray, dist, hitted) does the ray-hit detection among all the sub-geometries
 			returns the closest distance and the corresponding sub-geometry
 	*/
-	void TestHit(Ray const& ray, float& dist, Geometry*& hitted) const;
+	void TestHit(Ray const& ray, float& dist, Geometry const*& hitted) const;
 
 	// TestHitdevice is the device version of TestHit
-	__device__ void TestHitdevice(Ray const& ray, float& dist, Geometry*& hitted) const;
+	__device__ void TestHitdevice(Ray const& ray, float& dist, Geometry const*& hitted) const;
 	
 	size_t GetSize() const override { return sizeof(Cuboid); };
 

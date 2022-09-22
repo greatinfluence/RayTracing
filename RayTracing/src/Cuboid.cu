@@ -69,7 +69,7 @@ __host__ __device__ la::vec3 Cuboid::GetNorm(la::vec3 pos) const
 //}
 
 
-void Cuboid::TestHit(Ray const& ray, float& dist, Geometry*& hitted) const
+void Cuboid::TestHit(Ray const& ray, float& dist, Geometry const*& hitted) const
 {
 //	printf("The memory address of the Cuboid: %p\n", this);
 //	printf("The type of Cuboid: %d\n", (int)GeoType::Cuboid);
@@ -89,7 +89,7 @@ void Cuboid::TestHit(Ray const& ray, float& dist, Geometry*& hitted) const
 			auto geo = Geometryrepository::GetGeo(m_Subgeoid[i]);
 			if (geo->GetType() == GeoType::Cuboid) {
 				// A sublevel of Cuboid
-				auto* cub = static_cast<Cuboid*>(geo);
+				auto* cub = static_cast<Cuboid const*>(geo);
 				cub->TestHit(ray, dist, hitted);
 			}
 			else {
@@ -106,7 +106,7 @@ void Cuboid::TestHit(Ray const& ray, float& dist, Geometry*& hitted) const
 //	printf("Cuboid: End ray testing\n");
 }
 
-__device__ void Cuboid::TestHitdevice(Ray const& ray, float& dist, Geometry*& hitted) const
+__device__ void Cuboid::TestHitdevice(Ray const& ray, float& dist, Geometry const*& hitted) const
 {
 	//printf("The memory address of the Cuboid: %p\n", this);
 	//printf("The type of Cuboid: %d\n", (int)GeoType::Cuboid);
@@ -122,7 +122,7 @@ __device__ void Cuboid::TestHitdevice(Ray const& ray, float& dist, Geometry*& hi
 			auto geo = Geometryrepository::GetGeo(m_Subgeoid[i]);
 			if (geo->GetType() == GeoType::Cuboid) {
 				// A sublevel of Cuboid
-				auto* cub = static_cast<Cuboid*>(geo);
+				auto* cub = static_cast<Cuboid const*>(geo);
 				cub->TestHitdevice(ray, dist, hitted);
 			}
 			else {

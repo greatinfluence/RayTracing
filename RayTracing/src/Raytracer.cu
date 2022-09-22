@@ -5,7 +5,7 @@
 __device__ la::vec3 Raytracing::RayTracing(Ray const& ray, Cuboid* cub, la::vec3 const& m_Background,
 	curandState& state, int lev, la::vec3 coef) {
 	float dist = floatmax;
-	Geometry* hitted = nullptr;
+	Geometry const* hitted = nullptr;
 	cub->TestHitdevice(ray, dist, hitted);
 	//printf("End hit check\n");
 	if (hitted != nullptr) {

@@ -17,7 +17,7 @@ void World::AddGeo(std::shared_ptr<Geometry> geo)
 __host__ __device__ la::vec3 World::RayTracing(Ray const& ray, int lev, la::vec3 coef)
 {
 	float dist = std::numeric_limits<float>::max();
-	Geometry* hitted = nullptr;
+	Geometry const* hitted = nullptr;
 	if (fabs(ray.m_Dir.x) > 1.5f) {
 		printf("What?\n");
 	}
