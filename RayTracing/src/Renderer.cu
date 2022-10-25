@@ -54,6 +54,7 @@ namespace GPURenderer {
 		la::vec3* pixels;
 		Camera* pcam;
 		la::vec3* pbg;
+		Camera cam = world.GetCam();
 		
 		printf("Just enter\n");
 		checkCudaErrors(cudaMalloc(&curandstates, sizeof(curandState) * npixels));

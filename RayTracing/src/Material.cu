@@ -81,7 +81,7 @@ __host__ __device__ float Dieletric::scatter(la::vec3 pos, la::vec3 wo, la::vec3
 #endif
         < reflectance(fabs(cosine), ref_idx)) {
         // Reflect
-        wi = la::reflect(-wo, norm);
+        wi = la::reflect(wo, norm);
     }
     else {
         // Refract

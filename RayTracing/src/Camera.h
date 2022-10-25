@@ -22,9 +22,9 @@ public:
 	la::vec3 GetUp() const { return m_Up; }
 	float GetHor() const { return m_Horang; }
 	float GetPerp() const { return m_Perang; }
-private:
 	la::vec3 m_Pos;
 	la::vec3 m_Front, m_Up;
+private:
 	// horang denotes the sight angle of the horizontal direction
 	//   perang denotes the sight angle of the perpendicular direction
 	float m_Horang, m_Perang;

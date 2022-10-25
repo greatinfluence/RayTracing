@@ -255,6 +255,18 @@
     <ClInclude Include="src\la.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Object.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\vec3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lasetting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mat3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\twoballsconfig.yaml" />
@@ -369,6 +381,9 @@
     <ClCompile Include="src\vendor\yaml-cpp\src\tag.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="testpic.png">
@@ -409,6 +424,5 @@
     <CudaCompile Include="src\Material.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
-    <CudaCompile Include="src\la.cu" />
   </ItemGroup>
 </Project>

@@ -156,9 +156,12 @@
     <ClInclude Include="src\Cuboid.h" />
     <ClInclude Include="src\Fileoperator.h" />
     <ClInclude Include="src\la.h" />
+    <ClInclude Include="src\lasetting.h" />
     <ClInclude Include="src\Material.h" />
     <ClInclude Include="src\Materialrepository.h" />
     <ClInclude Include="src\Geometryrepository.h" />
+    <ClInclude Include="src\mat3.h" />
+    <ClInclude Include="src\Object.h" />
     <ClInclude Include="src\Random.h" />
     <ClInclude Include="src\Raytracer.h" />
     <ClInclude Include="src\Renderer.h" />
@@ -168,6 +171,7 @@
     <ClInclude Include="src\Geometry.h" />
     <ClInclude Include="src\Image.h" />
     <ClInclude Include="src\Ray.h" />
+    <ClInclude Include="src\vec3.h" />
     <ClInclude Include="src\vendor\stb_image\stb_image.h" />
     <ClInclude Include="src\vendor\stb_image\stb_image_write.h" />
     <ClInclude Include="src\vendor\yaml-cpp\include\yaml-cpp\anchor.h" />
@@ -234,7 +238,6 @@
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="src\Geometryrepository.cu" />
-    <CudaCompile Include="src\la.cu" />
     <CudaCompile Include="src\Materialrepository.cu">
       <FileType>Document</FileType>
     </CudaCompile>
@@ -269,6 +272,7 @@
     <CudaCompile Include="src\Settings.cpp">
       <FileType>Document</FileType>
     </CudaCompile>
+    <ClCompile Include="src\Object.cpp" />
     <ClCompile Include="src\Testtool.cpp" />
     <CudaCompile Include="src\Triangle.cu">
       <FileType>Document</FileType>
