@@ -4,6 +4,14 @@
 
 #include "Random.h"
 
+FishEyeCamera::FishEyeCamera(la::vec3 pos, la::vec3 front, la::vec3 up, double horang, double perang)
+: m_Pos(pos), m_Front(la::normalize(front)), m_Up(la::normalize(up)),
+		m_Horang(horang), m_Perang(perang) {
+	if (abs(la::dot(front, up)) > eps) {
+		std::cout << "Error: The FishEyeCamera's up/front vectors are not perpendicular" << std::endl;
+	}
+}
+
 void FishEyeCamera::GenRay(int x, int y, int width, int height, std::vector<Ray>& rays, int num) const {
 	double xl = ((double)x) / width, xr = ((double)x + 1) / width;
 	double yl = ((double)y) / height, yr = ((double)y + 1) / height;
@@ -33,25 +41,20 @@ __device__ Ray FishEyeCamera::GenRay(int x, int y, int width, int height, curand
 	const la::vec3 zaxis = la::cross(m_Front, m_Up);
 	double hora = GPURandom::Rand(lb, rb, state), perpa = GPURandom::Rand(db, ub, state);
 	la::vec3 dir = m_Front + tan(perpa) * m_Up + tan(hora) * zaxis;
-	return Ray(m_Pos, la::normalize(dir));
+	return Ray(std::move(m_Pos), la::normalize(dir));
 }
 
 void RegularCamera::GenRay(int x, int y, int width, int height, std::vector<Ray>& rays, int num) const
 {
 	double xl = ((double)x) / width, xr = ((double)x + 1) / width;
 	double yl = ((double)y) / height, yr = ((double)y + 1) / height;
-	la::vec3 const zaxis = la::cross(m_Front, m_Up);
-	for (int i = 0; i < num; ++i) {
-		la::vec3 dir = m_Front + Random::Rand(xl, xr) * m_Per * m_Up + Random::Rand(yl, yr) * m_Hor * zaxis;
-		rays.emplace_back(m_Pos, la::normalize(dir));
-	}
+	la::vec3 const right = la::cross(m_Front, m_Up);
+	la::vec3 dir = m_Front + Random::Rand(xl, xr) * m_Per * m_Up + Random::Rand(yl, yr) * m_Hor * right;
+	retyrn Ray(std::move(m_Pos), la::normalize(dir));
+
 }
 
-__device__ Ray RegularCamera::GenRay(int x, int y, int width, int height, curandState& state) const
+Ray RegularCamera::GenRay(int x, int y, int width, int height, curandState& state) const
 {
-	double xl = ((double)x) / width - 0.5, xr = ((double)x + 1) / width - 0.5;
-	double yl = ((double)y) / height - 0.5, yr = ((double)y + 1) / height - 0.5;
-	la::vec3 const zaxis = la::cross(m_Front, m_Up);
-	la::vec3 dir = m_Front + GPURandom::Rand(xl, xr, state) * m_Hor * zaxis + GPURandom::Rand(yl, yr, state) * m_Per * m_Up;
-	return Ray(m_Pos, la::normalize(dir));
+	return Ray();
 }

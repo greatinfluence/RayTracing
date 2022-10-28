@@ -3,6 +3,7 @@
 #include <iostream>
 #include <thread>
 #include <device_atomic_functions.h>
+#include <cassert>
 
 #include "Geometryrepository.h"
 #include "Raytracer.h"
@@ -16,7 +17,10 @@ namespace GPURenderer {
 		curand_init(19260817, idx, 0,  &state[idx]);
 	}
 
-	__global__ static void Dorender(Camera* pcam, la::vec3* pbg, size_t root, int width, int height,
+	__device__ Camera* rcam = nullptr;
+	__device__ Camera* fcam = nullptr;
+
+	__global__ static void regDorender(la::vec3* pbg, size_t root, int width, int height,
 		la::vec3* pixels, int nrays, curandState* states, volatile int* progress) {
 		int i = threadIdx.x + blockIdx.x * blockDim.x;
 		int j = threadIdx.y + blockIdx.y * blockDim.y;
@@ -27,17 +31,61 @@ namespace GPURenderer {
 		Cuboid* cub = static_cast<Cuboid*>(Geometryrepository::GetGeo(root));
 		la::vec3 bg = *pbg;
 		for (auto k = 0; k < nrays; ++k) {
-			Ray ray = pcam->GenRay(i, j, width, height, states[idx]);
-		//	printf("Dorender: Get ray (%f, %f, %f)->(%f, %f, %f)\n", ray.GetPos().x, ray.GetPos().y, ray.GetPos().z,
+			Ray ray = rcam->GenRay(i, j, width, height, states[idx]);
+			//	printf("Dorender: Get ray (%f, %f, %f)->(%f, %f, %f)\n", ray.GetPos().x, ray.GetPos().y, ray.GetPos().z,
 			//	ray.GetDir().x, ray.GetDir().y, ray.GetDir().z);
 			col += Raytracing::RayTracing(ray, cub, bg, states[idx]);
 		}
+		
 		pixels[idx] = sqrt(col / (float)nrays); // Gamma correction
 		if (!(threadIdx.x || threadIdx.y)) {
 			atomicAdd((int*)progress, 1);
 			__threadfence_system();
 		}
 	//	printf("- %d %d\n", i, j);
+	}
+
+	__global__ static void fishDorender(la::vec3* pbg, size_t root, int width, int height,
+		la::vec3* pixels, int nrays, curandState* states, volatile int* progress) {
+		int i = threadIdx.x + blockIdx.x * blockDim.x;
+		int j = threadIdx.y + blockIdx.y * blockDim.y;
+	//	printf("+ %d %d\n", i, j);
+		auto idx = j + i * height;
+		if ((i >= width) || (j >= height)) return;
+		auto col = la::vec3(0);
+		Cuboid* cub = static_cast<Cuboid*>(Geometryrepository::GetGeo(root));
+		la::vec3 bg = *pbg;
+		for (auto k = 0; k < nrays; ++k) {
+			Ray ray = fcam->GenRay(i, j, width, height, states[idx]);
+			//	printf("Dorender: Get ray (%f, %f, %f)->(%f, %f, %f)\n", ray.GetPos().x, ray.GetPos().y, ray.GetPos().z,
+			//	ray.GetDir().x, ray.GetDir().y, ray.GetDir().z);
+			col += Raytracing::RayTracing(ray, cub, bg, states[idx]);
+		}
+		
+		pixels[idx] = sqrt(col / (float)nrays); // Gamma correction
+		if (!(threadIdx.x || threadIdx.y)) {
+			atomicAdd((int*)progress, 1);
+			__threadfence_system();
+		}
+	//	printf("- %d %d\n", i, j);
+	}
+
+	__global__ void CreateRegCamonGPU(la::vec3 m_Pos, la::vec3 m_Front,
+		la::vec3 m_Up, double m_Hor, double m_Per) {
+		rcam = new RegularCamera(m_Pos, m_Front, m_Up, m_Hor, m_Per);
+	}
+
+	__global__ void CreateFishCamonGPU(la::vec3 pos, la::vec3 front,
+		la::vec3 up, double hor, double perp) {
+
+		printf("Begin\n");
+		fcam = new FishEyeCamera(pos, front, up, hor, perp);
+		printf("After generated\n");
+	}
+
+	__global__ void DeleteCam() {
+		if (rcam != nullptr) delete rcam;
+		else if (fcam != nullptr) delete fcam;
 	}
 
 	void Render(World& world, Image3& output, int nrays) {
@@ -48,20 +96,28 @@ namespace GPURenderer {
 
 		curandState* curandstates;
 		size_t root = world.GetRoot();
-		printf("%llu\n", root);
+		//printf("%llu\n", root);
 		int const width = output.GetWidth(), height = output.GetHeight();
 		int const npixels = width * height;
 		la::vec3* pixels;
-		Camera* pcam;
 		la::vec3* pbg;
-		Camera cam = world.GetCam();
 		
 		printf("Just enter\n");
 		checkCudaErrors(cudaMalloc(&curandstates, sizeof(curandState) * npixels));
 		checkCudaErrors(cudaMalloc(&pixels, sizeof(la::vec3) * npixels));
-		checkCudaErrors(cudaMalloc(&pcam, sizeof(Camera)));
-		checkCudaErrors(cudaMemcpy(pcam, &world.GetCam(), sizeof(Camera),
-			cudaMemcpyKind::cudaMemcpyHostToDevice));
+		//checkCudaErrors(cudaMalloc(&pcam, sizeof(FishEyeCamera)));
+		Camera* cam = world.GetCam().get();
+		if (cam->GetType() == CamType::Fish) {
+			auto fcam = static_cast<FishEyeCamera*>(cam);
+			CreateFishCamonGPU<<<1, 1>>>(fcam->m_Pos, fcam->m_Front, fcam->m_Up,
+				fcam->m_Horang, fcam->m_Perang);
+		}
+		else if (cam->GetType() == CamType::Reg) {
+			auto rcam = static_cast<RegularCamera*>(cam);
+			CreateRegCamonGPU<<<1, 1>>>(rcam->m_Pos, rcam->m_Front, rcam->m_Up,
+				rcam->m_Hor, rcam->m_Per);
+		}
+		else { std::cout << "Unknown Camera Type" << std::endl; }
 		la::vec3 background = world.GetBackground();
 		checkCudaErrors(cudaMalloc(&pbg, sizeof(la::vec3)));
 		checkCudaErrors(cudaMemcpy(pbg, &background, sizeof(la::vec3),
@@ -82,7 +138,10 @@ namespace GPURenderer {
 		checkCudaErrors(cudaHostGetDevicePointer((int**)&d_prog, (int*)progress, 0));
 		*progress = 0;
 		printf("Start rendering\n");
-		Dorender <<<blocks, threads>>> (pcam, pbg, root, width, height, pixels, nrays, curandstates, d_prog);
+		if(cam->GetType() == CamType::Reg)
+			regDorender <<<blocks, threads>>> (pbg, root, width, height, pixels, nrays, curandstates, d_prog);
+		else if(cam->GetType() == CamType::Fish)
+			fishDorender <<<blocks, threads>>> (pbg, root, width, height, pixels, nrays, curandstates, d_prog);
 		printf("Progress:\n");
 		float lastprogress = 0.0f;
 		do {
@@ -104,6 +163,7 @@ namespace GPURenderer {
 			output.Setcol((int)i / height, (int)i % height, cpupixels[i], true);
 		}
 		printf("Finish everything\n");
+		DeleteCam <<<1, 1 >>> ();
 		Materialrepository::CleanMemory();
 		Geometryrepository::Clearmemory();
 		delete[] cpupixels;
@@ -134,13 +194,13 @@ void Renderer::Render(World& world, Image3& output, int nrays, int OutputFreq) {
 
 void Renderer::DoRender(World& world, Image3& output, uint32_t from, uint32_t to, int nrays,
 	int OutputFreq, int nthread, std::mutex& lock) {
-	Camera const& cam = world.GetCam();
+	std::shared_ptr<Camera> cam = world.GetCam();
 	int const Width = output.GetWidth(), Height = output.GetHeight();
 	std::vector<Ray> rays;
 	std::vector<la::vec3> cols;
 	for (auto ind = from; ind < to; ++ind) {
 		auto i = ind / Height, j = ind % Height;
-		cam.GenRay(i, j, Width, Height, rays, nrays);
+		cam->GenRay(i, j, Width, Height, rays, nrays);
 		la::vec3 col = la::vec3(0.0f);
 		for (Ray const& ray : rays) {
 			col += world.RayTracing(ray);

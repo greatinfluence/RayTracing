@@ -32,23 +32,54 @@ namespace YAML {
 	};
 
 	template<>
-	struct convert<Camera> {
-		static Node encode(Camera const& cam) {
+	struct convert<CamType> {
+		static Node encode(CamType const& ctp) {
+			return (Node)(int)ctp;
+		}
+		static bool decode(Node const& node, CamType& ctp) {
+			if (!node.IsScalar()) return false;
+			ctp = (CamType)node.as<int>();
+			return true;
+		}
+	};
+
+	template<>
+	struct convert<std::shared_ptr<Camera>> {
+		static Node encode(std::shared_ptr<Camera> const& cam) {
 			Node node;
-			node["Pos"] = cam.GetPos();
-			node["Front"] = cam.GetFront();
-			node["Up"] = cam.GetUp();
-			node["Hor"] = cam.GetHor();
-			node["Perp"] = cam.GetPerp();
+			if (cam->GetType() == CamType::Fish) {
+				node["Type"] = CamType::Fish;
+				FishEyeCamera* fcam = static_cast<FishEyeCamera*>(cam.get());
+				node["Pos"] = fcam->m_Pos;
+				node["Front"] = fcam->m_Front;
+				node["Up"] = fcam->m_Up;
+				node["Hor"] = fcam->m_Horang;
+				node["Perp"] = fcam->m_Perang;
+			}
+			else if (cam->GetType() == CamType::Reg) {
+				node["Type"] = CamType::Reg;
+				RegularCamera* rcam = static_cast<RegularCamera*>(cam.get());
+				node["Pos"] = rcam->m_Pos;
+				node["Front"] = rcam->m_Front;
+				node["Up"] = rcam->m_Up;
+				node["Hor"] = rcam->m_Hor;
+				node["Perp"] = rcam->m_Per;
+			}
 			return node;
 		}
 
-		static bool decode(Node const& node, Camera& rhs) {
-			if (!node.IsMap() || node.size() != 5) {
+		static bool decode(Node const& node, std::shared_ptr<Camera>& rhs) {
+			if (!node.IsMap() || node.size() != 6 || !node["Type"]) {
 				return false;
 			}
-			rhs = Camera(node["Pos"].as<la::vec3>(), node["Front"].as<la::vec3>(), node["Up"].as<la::vec3>(),
-				node["Hor"].as<float>(), node["Perp"].as<float>());
+			if(node["Type"].as<CamType>() == CamType::Fish)
+			rhs = std::shared_ptr<Camera>(new FishEyeCamera(node["Pos"].as<la::vec3>(),
+				node["Front"].as<la::vec3>(), node["Up"].as<la::vec3>(),
+				node["Hor"].as<double>(), node["Perp"].as<double>()));
+			else if(node["Type"].as<CamType>() == CamType::Reg)
+			rhs = std::shared_ptr<Camera>(new RegularCamera(node["Pos"].as<la::vec3>(),
+				node["Front"].as<la::vec3>(), node["Up"].as<la::vec3>(),
+				node["Hor"].as<double>(), node["Perp"].as<double>()));
 			return true;
 		}
 	};
@@ -194,7 +225,7 @@ namespace YAML {
 	struct convert<World> {
 		static Node encode(World const& wd) {
 			Node node;
-			node["Camera"] = wd.GetCam();
+			node["Camera"] = std::shared_ptr<Camera>(wd.GetCam());
 			node["Background"] = wd.GetBackground();
 			auto ngeo = wd.GetNgeo();
 			for (auto i = 0; i < ngeo; ++i) {
@@ -217,7 +248,7 @@ namespace YAML {
 				return false;
 			}
 			if (!node["Camera"] || !node["Background"] || !node["Geos"]) return false;
-			wd = World(node["Camera"].as<Camera>(), node["Background"].as<la::vec3>());
+			wd = World(std::shared_ptr<Camera>(node["Camera"].as<std::shared_ptr<Camera>>()), node["Background"].as<la::vec3>());
 			auto geos = node["Geos"];
 			for (auto it = geos.begin(); it != geos.end(); ++it) {
 				wd.AddGeo(it->as<std::shared_ptr<Geometry>>());
