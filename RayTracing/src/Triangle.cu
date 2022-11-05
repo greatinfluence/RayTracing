@@ -16,18 +16,16 @@ la::vec3 Triangle::GetPos(size_t ind) const {
 	return *(m_Vertices + ind);
 }
 
-bool Triangle::OnTriangle(la::vec3 pos) const
-{
-	auto ed1 = m_Vertices[1] - m_Vertices[0], ed2 = m_Vertices[2] - m_Vertices[0];
-	auto vec = pos - m_Vertices[0];
-	auto fsthf = la::cross(ed1, vec), sechf = la::cross(vec, ed2);
-	if (fsthf.x * sechf.x < -1e-6 || fsthf.y * sechf.y < -1e-6 || fsthf.z * sechf.z < -1e-6)
-		return false;
-	ed1 = -ed1;
-	ed2 = m_Vertices[2] - m_Vertices[1];
-	vec = pos - m_Vertices[1];
-	fsthf = la::cross(ed1, vec), sechf = la::cross(vec, ed2);
-	if (fsthf.x * sechf.x < -1e-6 || fsthf.y * sechf.y < -1e-6 || fsthf.z * sechf.z < -1e-6)
-		return false;
-	return true;
+bool Triangle::OnTriangle(la::vec3 pos) const {
+	//	https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution
+	la::vec3 edge0 = m_Vertices[1] - m_Vertices[0],
+			edge1 = m_Vertices[2] - m_Vertices[1],
+			edge2 = m_Vertices[0] - m_Vertices[2];
+	la::vec3 C0 = pos - m_Vertices[0],
+		C1 = pos - m_Vertices[1],
+		C2 = pos - m_Vertices[2];
+	return la::dot(m_Norm, la::cross(edge0, C0)) > -eps &&
+		la::dot(m_Norm, la::cross(edge1, C1)) > -eps &&
+		la::dot(m_Norm, la::cross(edge2, C2)) > -eps;
+
 }
