@@ -155,6 +155,7 @@
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\Cuboid.h" />
     <ClInclude Include="src\Fileoperator.h" />
+    <ClInclude Include="src\Framegenerator.h" />
     <ClInclude Include="src\la.h" />
     <ClInclude Include="src\lasetting.h" />
     <ClInclude Include="src\Material.h" />
@@ -272,6 +273,8 @@
     <CudaCompile Include="src\Settings.cpp">
       <FileType>Document</FileType>
     </CudaCompile>
+    <ClCompile Include="src\Fileoperator.cpp" />
+    <ClCompile Include="src\Framegenerator.cpp" />
     <ClCompile Include="src\Object.cpp" />
     <ClCompile Include="src\Testtool.cpp" />
     <CudaCompile Include="src\Triangle.cu">

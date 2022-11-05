@@ -267,6 +267,9 @@
     <ClInclude Include="src\mat3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Framegenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\twoballsconfig.yaml" />
@@ -382,6 +385,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Object.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Framegenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Fileoperator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

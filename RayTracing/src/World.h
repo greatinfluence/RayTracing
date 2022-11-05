@@ -15,7 +15,7 @@ public:
 	// RayTracing(ray, lev, coef) traces the ray and returns the color seen by the ray
 	__host__ __device__ la::vec3 RayTracing(Ray const& ray, int lev = 1, la::vec3 coef = la::vec3(1.0f));
 
-	__host__ __device__ std::shared_ptr<Camera> GetCam() const { return m_Cam; }
+	__host__ std::shared_ptr<Camera> GetCam() const { return m_Cam; }
 	__host__ __device__ la::vec3 GetBackground() const { return m_Background; }
 
 	// GetNgeo() returns the number of geometries in the world

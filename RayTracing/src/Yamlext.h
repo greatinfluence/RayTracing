@@ -1,6 +1,7 @@
 #pragma once
 
 #include "yaml-cpp/yaml.h"
+#include <iostream>
 #include "la.h"
 #include "Camera.h"
 #include "Material.h"
