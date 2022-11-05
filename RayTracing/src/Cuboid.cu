@@ -12,7 +12,7 @@
 #include "World.h"
 
 __host__ __device__ Cuboid::Cuboid()
-	: m_Min{ floatmax, floatmax, floatmax }, m_Max{ floatmin, floatmin, floatmin },
+	: Geometry(GeoType::Cuboid), m_Min{ floatmax, floatmax, floatmax }, m_Max{ floatmin, floatmin, floatmin },
 	m_Nsubgeo{ 0 }, m_Subgeoid{nullptr} {}
 
 void Cuboid::AppendSubGeos(World const& world, std::vector<size_t> const& subgeos) {

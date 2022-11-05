@@ -12,7 +12,6 @@ public:
 
 	// AppendSubGeos(subgeos) appends all subgeos as sub-geometry into the cuboid
 	void AppendSubGeos(World const& world, std::vector<size_t> const& subgeos);
-	__host__ __device__ GeoType GetType() const override { return GeoType::Cuboid; }
 	__host__ __device__ la::vec3 GetNorm(la::vec3 pos) const override;
 
 	/*

@@ -12,7 +12,6 @@ public:
 	// GetPos(ind) returns the position of the ind-th vertex of the triangle
 	__host__ __device__ la::vec3 GetPos(size_t ind) const;
 
-	__host__ __device__ GeoType GetType() const override { return GeoType::Triangle; }
 	__host__ __device__ la::vec3 GetNorm(la::vec3 pos) const override { return m_Norm; }
 
 	// OnTriangle(pos) tests if pos is in the triangle

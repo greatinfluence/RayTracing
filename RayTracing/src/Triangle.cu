@@ -3,7 +3,7 @@
 #include <iostream>
 
 __host__ __device__ Triangle::Triangle(la::vec3 v1, la::vec3 v2, la::vec3 v3, la::vec3 norm)
-	:m_Vertices{v1, v2, v3}, m_Norm(norm) {
+	:Geometry(GeoType::Triangle), m_Vertices{v1, v2, v3}, m_Norm(norm) {
 	if (la::l2Norm(norm) < 1e-8) {
 		m_Norm = ComputeTriangNorm(v1, v2, v3);
 	}

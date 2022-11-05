@@ -14,10 +14,10 @@ enum class GeoType {
 
 class Geometry {
 public:
-	__host__ __device__ Geometry() : m_Matid{ 0u } {}
+	__host__ __device__ Geometry(GeoType tpe) : m_Type(tpe), m_Matid{ 0u } {}
 
 	// GetType() returns the type of the geometry
-	__host__ __device__ virtual GeoType GetType() const = 0;
+	__host__ __device__ GeoType GetType() const { return m_Type; };
 
 	// GetNorm(pos) returns the normal vector of the geometry at position pos
 	__host__ __device__ virtual la::vec3 GetNorm(la::vec3 pos) const = 0;
@@ -36,5 +36,6 @@ public:
 		m_Matid.mat = Materialrepository::GetMat(m_Matid.id);
 	}
 
+	GeoType m_Type;
 	sizet_or_matptr m_Matid;
 };
