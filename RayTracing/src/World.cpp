@@ -100,8 +100,14 @@ void World::ComputeInfo(Geometry* geo, la::vec3& cent, float& area) {
 		area = (float)(2 * pi * cyl->m_Radius * cyl->m_Height);
 		break;
 	}
+	case GeoType::Plate: {
+		auto* plt = static_cast<Plate*>(geo);
+		cent = plt->m_Cent;
+		area = (float)(2 * pi * (sq(plt->m_Outrad) - sq(plt->m_Inrad)));
+		break;
+	}
 	default: {
-		printf("ComputeInfo Cuboid Error: Unknown Geometry type\n");
+		printf("World::ComputeInfo Cuboid Error: Unknown Geometry type\n");
 	}
 	}
 }
