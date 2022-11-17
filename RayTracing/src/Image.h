@@ -31,6 +31,7 @@ public:
 	int GetWidth() const { return m_Width; }
 	int GetHeight() const { return m_Height; }
 	int GetChannels() const { return m_Channels; }
+	unsigned char* GetData() const { return m_Data; }
 	std::string GetFile() const { return m_Filepath; }
 private:
 	int m_Width, m_Height, m_Channels;

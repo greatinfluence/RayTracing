@@ -1,6 +1,9 @@
 #pragma once
 
 #include "Ray.h"
+#include "Cuboid.h"
+
+#include <vector>
 
 enum class CamType { Unknown = 0, Reg = 1, Fish = 2 };
 

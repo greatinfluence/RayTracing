@@ -9,7 +9,7 @@
 #include "Materialrepository.h"
 
 enum class GeoType {
-	Unknown = 0, Triangle = 1, Ball = 2, Cuboid = 3
+	Unknown = 0, Triangle = 1, Ball = 2, Cuboid = 3, Cylindsurf = 4, Plate = 5
 };
 
 class Geometry {

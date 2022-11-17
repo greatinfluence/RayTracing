@@ -7,6 +7,7 @@
 #include "Testtool.h"
 #include "Triangle.h"
 #include "Ball.h"
+#include "Cylindsurf.h"
 #include "Geometryrepository.h"
 
 void World::AddGeo(std::shared_ptr<Geometry> geo)
@@ -93,8 +94,14 @@ void World::ComputeInfo(Geometry* geo, la::vec3& cent, float& area) {
 		// Do nothing
 		break;
 	}
+	case GeoType::Cylindsurf: {
+		auto* cyl = static_cast<Cylindsurf*>(geo);
+		cent = cyl->m_Cent;
+		area = (float)(2 * pi * cyl->m_Radius * cyl->m_Height);
+		break;
+	}
 	default: {
-		printf("Cuboid Error: Unknown Geometry type\n");
+		printf("ComputeInfo Cuboid Error: Unknown Geometry type\n");
 	}
 	}
 }

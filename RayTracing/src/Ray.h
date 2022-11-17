@@ -1,9 +1,7 @@
 #pragma once
 
 #include "la.h"
-#include "Triangle.h"
-#include "Cuboid.h"
-#include "Ball.h"
+#include "Geometry.h"
 #include "Settings.h"
 
 class Ray {

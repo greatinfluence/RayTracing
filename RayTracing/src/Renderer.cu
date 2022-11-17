@@ -90,9 +90,14 @@ namespace GPURenderer {
 
 	void Render(World& world, Image3& output, int nrays) {
 		world.CreateHierarchy();
+		printf("After creating hierarchy\n");
 		Geometryrepository::Initiate(world);
+		printf("After initiating the world\n");
 		Materialrepository::Sendtogpu();
+		printf("After send mats to GPU\n");
 		Geometryrepository::Sendtogpu();
+		printf("After send geos to GPU\n");
+		
 
 		curandState* curandstates;
 		size_t root = world.GetRoot();
@@ -117,7 +122,7 @@ namespace GPURenderer {
 			CreateRegCamonGPU<<<1, 1>>>(rcam->m_Pos, rcam->m_Front, rcam->m_Up,
 				rcam->m_Hor, rcam->m_Per);
 		}
-		else { std::cout << "Unknown Camera Type" << std::endl; }
+		else { std::cout << "GPURenderer::Render: Unknown Camera Type" << std::endl; }
 		la::vec3 background = world.GetBackground();
 		checkCudaErrors(cudaMalloc(&pbg, sizeof(la::vec3)));
 		checkCudaErrors(cudaMemcpy(pbg, &background, sizeof(la::vec3),

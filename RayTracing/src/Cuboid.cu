@@ -6,6 +6,7 @@
 #include "la.h"
 #include "Ball.h"
 #include "Triangle.h"
+#include "Cylindsurf.h"
 #include "Ray.h"
 #include "Settings.h"
 #include "Geometryrepository.h"
@@ -49,8 +50,30 @@ void Cuboid::AppendSubGeos(World const& world, std::vector<size_t> const& subgeo
 			}
 			break;
 		}
+		case GeoType::Cylindsurf: {
+			auto* subcy = static_cast<Cylindsurf*>(subgeo.get());
+			// It's the bounding box of the capsule containing the cylinder
+			for (auto i = 0; i < 3; ++i) {
+				float minBB = subcy->m_Cent[i] - fabs(subcy->m_Up[i]) * (subcy->m_Height / 2);
+				float maxBB = subcy->m_Cent[i] + fabs(subcy->m_Up[i]) * (subcy->m_Height / 2);
+				m_Min[i] = fmin(m_Min[i], minBB - subcy->m_Radius);
+				m_Max[i] = fmax(m_Min[i], maxBB + subcy->m_Radius);
+			}
+			//printf("%f %f %f-> %f %f %f\n", m_Min[0], m_Min[1], m_Min[2], m_Max[0], m_Max[1], m_Max[2]);
+			break;
+		}
+		case GeoType::Plate: {
+			auto* subpt = static_cast<Plate*>(subgeo.get());
+			m_Min[0] = fmin(m_Min[0], subpt->m_Cent.x - fabs(subpt->m_Outrad * la::l2Norm(la::perp(subpt->m_Up, la::vec3(1.0f, 0, 0)))));
+			m_Max[0] = fmax(m_Max[0], subpt->m_Cent.x + fabs(subpt->m_Outrad * la::l2Norm(la::perp(subpt->m_Up, la::vec3(1.0f, 0, 0)))));
+			m_Min[1] = fmin(m_Min[1], subpt->m_Cent.y - fabs(subpt->m_Outrad * la::l2Norm(la::perp(subpt->m_Up, la::vec3(0, 1.0f, 0)))));
+			m_Max[1] = fmax(m_Max[1], subpt->m_Cent.y + fabs(subpt->m_Outrad * la::l2Norm(la::perp(subpt->m_Up, la::vec3(0, 1.0f, 0)))));
+			m_Min[2] = fmin(m_Min[2], subpt->m_Cent.z - fabs(subpt->m_Outrad * la::l2Norm(la::perp(subpt->m_Up, la::vec3(0, 0, 1.0f)))));
+			m_Max[2] = fmax(m_Max[2], subpt->m_Cent.z + fabs(subpt->m_Outrad * la::l2Norm(la::perp(subpt->m_Up, la::vec3(0, 0, 1.0f)))));
+			break;
+		}
 		default: {
-			printf("Unrecongnized Geometry Type!\n");
+			printf("Cuboid::Appendsubgeos: Unrecongnized Geometry Type: %d\n", subgeo->GetType());
 			return;
 		}
 		}

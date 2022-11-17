@@ -1,4 +1,5 @@
 #include "Object.h"
+#include "Triangle.h"
 
 void Cube::AppendtoWorld(World& world) {
 	la::vec3 pos[8];

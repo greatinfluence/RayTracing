@@ -1,6 +1,11 @@
 #include "Ray.h"
 
 //#include <cassert>
+#include "Triangle.h"
+#include "Cuboid.h"
+#include "Ball.h"
+#include "Cylindsurf.h"
+#include "Plate.h"
 
 #include "la.h"
 
@@ -123,10 +128,68 @@ __device__ static float Hittriangle(Ray const& ray, Triangle const* triangle) {
 	}
 	float dist = l2Norm(pp) / cosval;
 	la::vec3 pos = m_Pos + m_Dir * dist;
-	la::vec3 vec = pos - triangle->GetPos(0);
-	float val = l2Norm(proj(vec, norm));
-//	assert(val < 1e-4);
 	if (triangle->OnTriangle(m_Pos + m_Dir * dist)) {
+		return dist;
+	}
+	else return floatmax;
+}
+
+__device__ static float HitCylindsurf(Ray const& ray, Cylindsurf const* geo) {
+	auto& up = geo->m_Up;
+	float du = la::dot(ray.m_Dir, up);
+	if (fabs(1.0f - du) < eps) {
+		// The direction is parallel to the axis of the cylinder, impossible to hit
+		return floatmax;
+	}
+	auto s = ray.m_Pos - geo->m_Cent;
+	float su = la::dot(s, up);
+	float a = 1 - sq(du);
+	float b = la::dot(s, ray.m_Dir) - su * du;
+	float c = la::dot(s, s) - sq(su) - sq(geo->m_Radius);
+	float delt = b * b - a * c;
+	if (delt < 0) {
+		// Has no root!
+		return floatmax;
+	}
+	if (fabs(la::l2Norm(ray.m_Dir) - 1.0f) > eps ||
+		fabs(la::l2Norm(up) - 1.0f) > eps) printf("Wrong range.\n");
+	if (a < 0) printf("What???\n");
+	double sqdlt = sqrt((double)delt);
+	float t = 0.0f;
+	la::vec3 pos = la::vec3();
+	if (sqdlt + b < 0) {
+		t = -(sqdlt + b) / a;
+		pos = ray.m_Pos + t * ray.m_Dir;
+		if (la::l2Norm(la::proj(pos - geo->m_Cent, up)) <= geo->m_Height / 2)
+			return t;
+	}
+	else if (sqdlt > b) {
+		t = (sqdlt - b) / a;
+		pos = ray.m_Pos + t * ray.m_Dir;
+		if (la::l2Norm(la::proj(pos - geo->m_Cent, up)) <= geo->m_Height / 2)
+			return t;
+	}
+	return floatmax;
+}
+
+__device__ inline static float HitPlate(Ray const& ray, Plate const* plt) {
+	auto const& m_Pos = ray.m_Pos;
+	auto const& m_Dir = ray.m_Dir;
+	la::vec3 norm = plt->m_Up;
+	la::vec3 pp = proj(plt->m_Cent- m_Pos, norm);
+	if (l2Norm(pp) < eps) {
+		// Too close to the plate
+		return floatmax;
+	}
+	float cosval = la::dot(pp, m_Dir) / l2Norm(pp);
+	if (cosval < eps) {
+		// Leaving or perpendicular to the plane of the plate
+		return floatmax;
+	}
+	float dist = l2Norm(pp) / cosval;
+	la::vec3 pos = m_Pos + m_Dir * dist;
+	float dd = la::l2Norm(pos - plt->m_Cent);
+	if (dd >= plt->m_Inrad && dd <= plt->m_Outrad) {
 		return dist;
 	}
 	else return floatmax;
@@ -152,6 +215,12 @@ __device__ inline static float Hitdevice(Ray const& ray, Geometry const* geo) {
 	}
 	case GeoType::Cuboid: {
 		return Hitcuboid(ray, static_cast<Cuboid const*>(geo));
+	}
+	case GeoType::Cylindsurf: {
+		return HitCylindsurf(ray, static_cast<Cylindsurf const*>(geo));
+	}
+	case GeoType::Plate: {
+		return HitPlate(ray, static_cast<Plate const*>(geo));
 	}
 	default: {
 		printf("Not implemented yet!\n");

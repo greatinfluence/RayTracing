@@ -270,6 +270,18 @@
     <ClInclude Include="src\Framegenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Texturerepository.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Cylindsurf.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Plate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="src\twoballsconfig.yaml" />
@@ -431,6 +443,9 @@
       <Filter>Source Files</Filter>
     </CudaCompile>
     <CudaCompile Include="src\Material.cu">
+      <Filter>Source Files</Filter>
+    </CudaCompile>
+    <CudaCompile Include="src\Texturerepository.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
   </ItemGroup>

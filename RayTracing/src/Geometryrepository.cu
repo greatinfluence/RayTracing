@@ -1,5 +1,6 @@
 #include "Geometryrepository.h"
 #include "World.h"
+
 namespace Geometryrepository {
 	__device__ Geometry** g_Geos;
 	Geometry** g_Geos_cpu;
@@ -56,6 +57,18 @@ namespace Geometryrepository {
 		place = tri;
 	}
 
+	__global__ void CreateCylonGPU(Geometry*& place, la::vec3 cent, la::vec3 up, float r, float h, size_t matid) {
+		auto cs = new Cylindsurf(cent, up, r, h);
+		cs->AddMaterial(matid);
+		place = cs;
+	}
+
+	__global__ void CreatePltonGPU(Geometry*& place, la::vec3 cent, la::vec3 up, float out, float in, size_t matid) {
+		auto plt = new Plate(cent, up, out, in);
+		plt->AddMaterial(matid);
+		place = plt;
+	}
+
 	__global__ void Transferids(size_t size) {
 		int ind = threadIdx.x + blockIdx.x * blockDim.x;
 		if (ind < size) {
@@ -96,6 +109,16 @@ namespace Geometryrepository {
 				auto tri = static_cast<Triangle*>(m_Geos[i].get());
 				CreateTriangleonGPU<<<1, 1>>>(g_Geos_cpu[i], tri->GetPos(0), tri->GetPos(1), tri->GetPos(2),
 					tri->GetNorm(la::vec3(0)), tri->m_Matid.id);
+				break;
+			}
+			case GeoType::Cylindsurf: {
+				auto cyl = static_cast<Cylindsurf*>(m_Geos[i].get());
+				CreateCylonGPU<<<1, 1>>>(g_Geos_cpu[i], cyl->m_Cent, cyl->m_Up, cyl->m_Radius, cyl->m_Height, cyl->m_Matid.id);
+				break;
+			}
+			case GeoType::Plate: {
+				auto plt = static_cast<Plate*>(m_Geos[i].get());
+				CreatePltonGPU<<<1, 1>>>(g_Geos_cpu[i], plt->m_Cent, plt->m_Up, plt->m_Outrad, plt->m_Inrad, plt->m_Matid.id);
 				break;
 			}
 			default: {

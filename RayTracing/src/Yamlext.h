@@ -7,6 +7,8 @@
 #include "Material.h"
 #include "Triangle.h"
 #include "Ball.h"
+#include "Cylindsurf.h"
+#include "Plate.h"
 #include "World.h"
 #include "Image.h"
 
@@ -188,6 +190,22 @@ namespace YAML {
 				node["Norm"] = tri->GetNorm(la::vec3(0));
 				break;
 			}
+			case GeoType::Cylindsurf: {
+				auto cyl = static_cast<Cylindsurf*>(geo.get());
+				node["Center"] = cyl->m_Cent;
+				node["Up"] = cyl->m_Up;
+				node["Radius"] = cyl->m_Radius;
+				node["Height"] = cyl->m_Height;
+				break;
+			}
+			case GeoType::Plate: {
+				auto plt = static_cast<Plate*>(geo.get());
+				node["Center"] = plt->m_Cent;
+				node["Up"] = plt->m_Up;
+				node["Out"] = plt->m_Outrad;
+				node["In"] = plt->m_Inrad;
+				break;
+			}
 			default: {
 				throw std::out_of_range("YAML error: unrecognized Geometry type");
 			}
@@ -211,6 +229,24 @@ namespace YAML {
 					node["Vertices"][0].as<la::vec3>(),
 					node["Vertices"][1].as<la::vec3>(),
 					node["Vertices"][2].as<la::vec3>(), node["Norm"].as<la::vec3>()));
+				break;
+			}
+			case GeoType::Cylindsurf: {
+				rhs = std::shared_ptr<Geometry>(new Cylindsurf(
+					node["Center"].as<la::vec3>(),
+					node["Up"].as<la::vec3>(),
+					node["Radius"].as<float>(),
+					node["Height"].as<float>()
+				));
+				break;
+			}
+			case GeoType::Plate: {
+				rhs = std::shared_ptr<Geometry>(new Plate(
+					node["Center"].as<la::vec3>(),
+					node["Up"].as<la::vec3>(),
+					node["Out"].as<float>(),
+					node["In"].as<float>()
+				));
 				break;
 			}
 			default: {

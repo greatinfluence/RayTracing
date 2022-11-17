@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Ray.h"
+#include "Cuboid.h"
 #include "Random.h"
 
 namespace Raytracing {
