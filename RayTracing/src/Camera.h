@@ -27,7 +27,7 @@ public:
 		m_Hor{ 2.0f * 2 }, m_Per{ 2.0f } {}
 
 	__host__ __device__ RegularCamera(la::vec3 pos, la::vec3 front, la::vec3 up, double hor = 4.0, double per = 2.0):
-		m_Pos{ pos }, m_Front{ front }, m_Up{ up }, m_Hor{ hor }, m_Per{ per } {}
+		m_Pos{ pos }, m_Front{ la::normalize(front) }, m_Up{ la::normalize(up) }, m_Hor{ hor }, m_Per{ per } {}
 
 	__host__ __device__ CamType GetType() const override { return CamType::Reg; }
 

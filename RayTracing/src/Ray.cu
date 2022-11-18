@@ -137,13 +137,16 @@ __device__ static float Hittriangle(Ray const& ray, Triangle const* triangle) {
 __device__ static float HitCylindsurf(Ray const& ray, Cylindsurf const* geo) {
 	auto& up = geo->m_Up;
 	float du = la::dot(ray.m_Dir, up);
-	if (fabs(1.0f - du) < eps) {
+	if (fabs(1.0f - fabs(du)) < eps) {
 		// The direction is parallel to the axis of the cylinder, impossible to hit
 		return floatmax;
 	}
 	auto s = ray.m_Pos - geo->m_Cent;
 	float su = la::dot(s, up);
 	float a = 1 - sq(du);
+	if (a < 0) {
+		printf("Ray::HitCylindsurf: What???\n");
+	}
 	float b = la::dot(s, ray.m_Dir) - su * du;
 	float c = la::dot(s, s) - sq(su) - sq(geo->m_Radius);
 	float delt = b * b - a * c;
@@ -153,7 +156,6 @@ __device__ static float HitCylindsurf(Ray const& ray, Cylindsurf const* geo) {
 	}
 	if (fabs(la::l2Norm(ray.m_Dir) - 1.0f) > eps ||
 		fabs(la::l2Norm(up) - 1.0f) > eps) printf("Wrong range.\n");
-	if (a < 0) printf("What???\n");
 	double sqdlt = sqrt((double)delt);
 	float t = 0.0f;
 	la::vec3 pos = la::vec3();
